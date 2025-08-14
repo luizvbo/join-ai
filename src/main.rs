@@ -1,7 +1,7 @@
 use clap::Parser;
 use ignore::{WalkBuilder, WalkState};
 use std::fs::{self, File};
-use std::io::{self, Write};
+use std::io::{self, Write}; // Added Read trait for tests
 use std::path::PathBuf;
 use std::sync::mpsc;
 
@@ -153,7 +153,7 @@ fn run_concatenation(args: Args) -> anyhow::Result<()> {
     for path in rx {
         match fs::read(&path) {
             Ok(contents) => {
-                // Check if the file is binary
+                // Check if the file is binary using content_inspector
                 if content_inspector::inspect(&contents).is_binary() {
                     println!("Skipping binary file: {}", path.display());
                     continue;
@@ -165,7 +165,6 @@ fn run_concatenation(args: Args) -> anyhow::Result<()> {
                 writeln!(output_file)?;
             }
             Err(e) => {
-                // Ignore errors from special files that can't be read
                 if e.kind() != io::ErrorKind::InvalidData {
                     eprintln!("Failed to read file {}: {}", path.display(), e);
                 }
@@ -184,12 +183,10 @@ fn run_concatenation(args: Args) -> anyhow::Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use anyhow::Result;
+    use assert_fs::TempDir;
     use assert_fs::prelude::*;
-    use std::fs::File;
     use std::io::Read;
     use std::path::Path;
-    use tempfile::tempdir;
 
     fn get_test_args(input_folder: &Path, output_file: &Path) -> Args {
         Args {
@@ -207,17 +204,18 @@ mod tests {
 
     #[test]
     fn test_basic_concatenation() -> anyhow::Result<()> {
-        let dir = tempdir()?;
-        let input_dir = dir.path();
-        let file1 = input_dir.child("file1.txt");
-        let file2 = input_dir.child("file2.txt");
+        let dir = TempDir::new()?; // <--- Use assert_fs::TempDir::new()
+        let input_dir_path = dir.path();
+
+        let file1 = dir.child("file1.txt");
+        let file2 = dir.child("file2.txt");
         file1.write_str("Hello")?;
         file2.write_str("World")?;
 
-        let output_file = dir.path().join("output.txt");
-        let args = get_test_args(input_dir, &output_file);
+        let output_file = input_dir_path.join("output.txt");
+        let args = get_test_args(input_dir_path, &output_file);
 
-        run_concatenation(args)?;
+        super::run_concatenation(args)?;
 
         let mut result = String::new();
         File::open(&output_file)?.read_to_string(&mut result)?;
@@ -233,21 +231,22 @@ mod tests {
 
     #[test]
     fn test_exclude_folders() -> anyhow::Result<()> {
-        let dir = tempdir()?;
-        let input_dir = dir.path();
-        let src_dir = input_dir.child("src");
+        let dir = TempDir::new()?; // <--- Use assert_fs::TempDir::new()
+        let input_dir_path = dir.path();
+
+        let src_dir = dir.child("src");
         src_dir.create_dir_all()?;
         src_dir.child("main.rs").write_str("fn main() {}")?;
 
-        let exclude_dir = input_dir.child("exclude");
+        let exclude_dir = dir.child("exclude");
         exclude_dir.create_dir_all()?;
         exclude_dir.child("me.txt").write_str("ignore")?;
 
-        let output_file = dir.path().join("output.txt");
-        let mut args = get_test_args(input_dir, &output_file);
+        let output_file = input_dir_path.join("output.txt");
+        let mut args = get_test_args(input_dir_path, &output_file);
         args.exclude_folders = Some(vec!["exclude".to_string()]);
 
-        run_concatenation(args)?;
+        super::run_concatenation(args)?;
 
         let mut result = String::new();
         File::open(&output_file)?.read_to_string(&mut result)?;
@@ -260,16 +259,17 @@ mod tests {
 
     #[test]
     fn test_exclude_extensions() -> anyhow::Result<()> {
-        let dir = tempdir()?;
-        let input_dir = dir.path();
-        input_dir.child("code.rs").write_str("let x = 1;")?;
-        input_dir.child("image.png").write_binary(b"binarydata")?;
+        let dir = TempDir::new()?; // <--- Use assert_fs::TempDir::new()
+        let input_dir_path = dir.path();
 
-        let output_file = dir.path().join("output.txt");
-        let mut args = get_test_args(input_dir, &output_file);
+        dir.child("code.rs").write_str("let x = 1;")?;
+        dir.child("image.png").write_binary(b"binarydata")?;
+
+        let output_file = input_dir_path.join("output.txt");
+        let mut args = get_test_args(input_dir_path, &output_file);
         args.exclude_extensions = Some(vec!["png".to_string()]);
 
-        run_concatenation(args)?;
+        super::run_concatenation(args)?;
 
         let mut result = String::new();
         File::open(&output_file)?.read_to_string(&mut result)?;
@@ -282,19 +282,20 @@ mod tests {
 
     #[test]
     fn test_filter_by_pattern() -> anyhow::Result<()> {
-        let dir = tempdir()?;
-        let input_dir = dir.path();
-        input_dir.child("Cargo.toml").write_str("[package]")?;
-        input_dir.child("README.md").write_str("# Project")?;
-        let src_dir = input_dir.child("src");
+        let dir = TempDir::new()?; // <--- Use assert_fs::TempDir::new()
+        let input_dir_path = dir.path();
+
+        dir.child("Cargo.toml").write_str("[package]")?;
+        dir.child("README.md").write_str("# Project")?;
+        let src_dir = dir.child("src");
         src_dir.create_dir_all()?;
         src_dir.child("main.rs").write_str("fn main(){}")?;
 
-        let output_file = dir.path().join("output.txt");
-        let mut args = get_test_args(input_dir, &output_file);
+        let output_file = input_dir_path.join("output.txt");
+        let mut args = get_test_args(input_dir_path, &output_file);
         args.patterns = Some(vec!["*.rs".to_string(), "*.toml".to_string()]);
 
-        run_concatenation(args)?;
+        super::run_concatenation(args)?;
 
         let mut result = String::new();
         File::open(&output_file)?.read_to_string(&mut result)?;
@@ -308,11 +309,12 @@ mod tests {
 
     #[test]
     fn test_max_depth() -> anyhow::Result<()> {
-        let dir = tempdir()?;
-        let input_dir = dir.path();
-        input_dir.child("file1.txt").write_str("level 1")?;
+        let dir = TempDir::new()?; // <--- Use assert_fs::TempDir::new()
+        let input_dir_path = dir.path();
 
-        let level2_dir = input_dir.child("level2");
+        dir.child("file1.txt").write_str("level 1")?;
+
+        let level2_dir = dir.child("level2");
         level2_dir.create_dir_all()?;
         level2_dir.child("file2.txt").write_str("level 2")?;
 
@@ -320,11 +322,11 @@ mod tests {
         level3_dir.create_dir_all()?;
         level3_dir.child("file3.txt").write_str("level 3")?;
 
-        let output_file = dir.path().join("output.txt");
-        let mut args = get_test_args(input_dir, &output_file);
+        let output_file = input_dir_path.join("output.txt");
+        let mut args = get_test_args(input_dir_path, &output_file);
         args.max_depth = Some(2); // Should include file1 and file2, but not file3
 
-        run_concatenation(args)?;
+        super::run_concatenation(args)?;
 
         let mut result = String::new();
         File::open(&output_file)?.read_to_string(&mut result)?;
@@ -338,18 +340,17 @@ mod tests {
 
     #[test]
     fn test_skip_binary_files() -> anyhow::Result<()> {
-        let dir = tempdir()?;
-        let input_dir = dir.path();
-        input_dir.child("text.txt").write_str("some text")?;
+        let dir = TempDir::new()?; // <--- Use assert_fs::TempDir::new()
+        let input_dir_path = dir.path();
+
+        dir.child("text.txt").write_str("some text")?;
         // 0xFF is a common byte in binary files but not valid in UTF-8
-        input_dir
-            .child("binary.bin")
-            .write_binary(&[0xFF, 0xFE, 0xFD])?;
+        dir.child("binary.bin").write_binary(&[0xFF, 0xFE, 0xFD])?;
 
-        let output_file = dir.path().join("output.txt");
-        let args = get_test_args(input_dir, &output_file);
+        let output_file = input_dir_path.join("output.txt");
+        let args = get_test_args(input_dir_path, &output_file);
 
-        run_concatenation(args)?;
+        super::run_concatenation(args)?;
 
         let mut result = String::new();
         File::open(&output_file)?.read_to_string(&mut result)?;
