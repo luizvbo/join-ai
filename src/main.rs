@@ -1,7 +1,7 @@
 use clap::Parser;
 use ignore::{WalkBuilder, WalkState};
 use std::fs::{self, File};
-use std::io::{self, Write}; // Added Read trait for tests
+use std::io::{self, Write};
 use std::path::PathBuf;
 use std::sync::mpsc;
 
@@ -90,25 +90,27 @@ fn run_concatenation(args: Args) -> anyhow::Result<()> {
         .follow_links(!args.no_follow)
         .max_depth(args.max_depth);
 
-    // Add glob patterns to include
+    // --- FIX: Use a single OverrideBuilder for all include/exclude patterns ---
+    let mut override_builder = ignore::overrides::OverrideBuilder::new(&args.input_folder);
+
     if let Some(patterns) = &args.patterns {
-        let mut override_builder = ignore::overrides::OverrideBuilder::new(&args.input_folder);
         for pattern in patterns {
             override_builder.add(pattern)?;
         }
-        let overrides = override_builder.build()?;
-        walker_builder.overrides(overrides);
+    } else {
+        // If no patterns are specified, default to including everything.
+        override_builder.add("*")?;
     }
 
-    // Add folders to exclude
     if let Some(exclude_folders) = &args.exclude_folders {
         for folder in exclude_folders {
-            let mut path = PathBuf::new();
-            path.push(&args.input_folder);
-            path.push(folder);
-            walker_builder.add_ignore(path);
+            // Add a negative pattern to exclude the folder. The '!' negates the pattern.
+            override_builder.add(&format!("!{}", folder))?;
         }
     }
+
+    let overrides = override_builder.build()?;
+    walker_builder.overrides(overrides);
 
     // Build the parallel walker
     let walker = walker_builder.build_parallel();
@@ -133,12 +135,11 @@ fn run_concatenation(args: Args) -> anyhow::Result<()> {
                     return WalkState::Continue;
                 }
 
-                if let Some(ext_str) = path.extension().and_then(|s| s.to_str()) {
-                    if let Some(exts_to_exclude) = &exclude_extensions {
-                        if exts_to_exclude.contains(&ext_str.to_string()) {
-                            return WalkState::Continue;
-                        }
-                    }
+                if let Some(ext_str) = path.extension().and_then(|s| s.to_str())
+                    && let Some(exts_to_exclude) = &exclude_extensions
+                    && exts_to_exclude.contains(&ext_str.to_string())
+                {
+                    return WalkState::Continue;
                 }
                 tx.send(path.to_path_buf()).expect("Failed to send path");
             }
@@ -185,6 +186,7 @@ mod tests {
     use super::*;
     use assert_fs::TempDir;
     use assert_fs::prelude::*;
+    use std::fs::File;
     use std::io::Read;
     use std::path::Path;
 
@@ -204,7 +206,7 @@ mod tests {
 
     #[test]
     fn test_basic_concatenation() -> anyhow::Result<()> {
-        let dir = TempDir::new()?; // <--- Use assert_fs::TempDir::new()
+        let dir = TempDir::new()?;
         let input_dir_path = dir.path();
 
         let file1 = dir.child("file1.txt");
@@ -215,7 +217,7 @@ mod tests {
         let output_file = input_dir_path.join("output.txt");
         let args = get_test_args(input_dir_path, &output_file);
 
-        super::run_concatenation(args)?;
+        run_concatenation(args)?;
 
         let mut result = String::new();
         File::open(&output_file)?.read_to_string(&mut result)?;
@@ -231,7 +233,7 @@ mod tests {
 
     #[test]
     fn test_exclude_folders() -> anyhow::Result<()> {
-        let dir = TempDir::new()?; // <--- Use assert_fs::TempDir::new()
+        let dir = TempDir::new()?;
         let input_dir_path = dir.path();
 
         let src_dir = dir.child("src");
@@ -246,7 +248,7 @@ mod tests {
         let mut args = get_test_args(input_dir_path, &output_file);
         args.exclude_folders = Some(vec!["exclude".to_string()]);
 
-        super::run_concatenation(args)?;
+        run_concatenation(args)?;
 
         let mut result = String::new();
         File::open(&output_file)?.read_to_string(&mut result)?;
@@ -259,7 +261,7 @@ mod tests {
 
     #[test]
     fn test_exclude_extensions() -> anyhow::Result<()> {
-        let dir = TempDir::new()?; // <--- Use assert_fs::TempDir::new()
+        let dir = TempDir::new()?;
         let input_dir_path = dir.path();
 
         dir.child("code.rs").write_str("let x = 1;")?;
@@ -269,7 +271,7 @@ mod tests {
         let mut args = get_test_args(input_dir_path, &output_file);
         args.exclude_extensions = Some(vec!["png".to_string()]);
 
-        super::run_concatenation(args)?;
+        run_concatenation(args)?;
 
         let mut result = String::new();
         File::open(&output_file)?.read_to_string(&mut result)?;
@@ -282,7 +284,7 @@ mod tests {
 
     #[test]
     fn test_filter_by_pattern() -> anyhow::Result<()> {
-        let dir = TempDir::new()?; // <--- Use assert_fs::TempDir::new()
+        let dir = TempDir::new()?;
         let input_dir_path = dir.path();
 
         dir.child("Cargo.toml").write_str("[package]")?;
@@ -295,7 +297,7 @@ mod tests {
         let mut args = get_test_args(input_dir_path, &output_file);
         args.patterns = Some(vec!["*.rs".to_string(), "*.toml".to_string()]);
 
-        super::run_concatenation(args)?;
+        run_concatenation(args)?;
 
         let mut result = String::new();
         File::open(&output_file)?.read_to_string(&mut result)?;
@@ -309,7 +311,7 @@ mod tests {
 
     #[test]
     fn test_max_depth() -> anyhow::Result<()> {
-        let dir = TempDir::new()?; // <--- Use assert_fs::TempDir::new()
+        let dir = TempDir::new()?;
         let input_dir_path = dir.path();
 
         dir.child("file1.txt").write_str("level 1")?;
@@ -326,7 +328,7 @@ mod tests {
         let mut args = get_test_args(input_dir_path, &output_file);
         args.max_depth = Some(2); // Should include file1 and file2, but not file3
 
-        super::run_concatenation(args)?;
+        run_concatenation(args)?;
 
         let mut result = String::new();
         File::open(&output_file)?.read_to_string(&mut result)?;
@@ -340,7 +342,7 @@ mod tests {
 
     #[test]
     fn test_skip_binary_files() -> anyhow::Result<()> {
-        let dir = TempDir::new()?; // <--- Use assert_fs::TempDir::new()
+        let dir = TempDir::new()?;
         let input_dir_path = dir.path();
 
         dir.child("text.txt").write_str("some text")?;
@@ -350,7 +352,7 @@ mod tests {
         let output_file = input_dir_path.join("output.txt");
         let args = get_test_args(input_dir_path, &output_file);
 
-        super::run_concatenation(args)?;
+        run_concatenation(args)?;
 
         let mut result = String::new();
         File::open(&output_file)?.read_to_string(&mut result)?;
