@@ -10,7 +10,7 @@ description = "A tool to traverse files in a folder and concatenate them into a 
 
 [dependencies]
 anyhow = "1.0.99"
-clap = { version = "4.5.45", features = ["derive"] }
+clap = { version = "4.5.45", features = ["derive", "color"] }
 content_inspector = "0.2.4"
 ignore = "0.4.23"
 

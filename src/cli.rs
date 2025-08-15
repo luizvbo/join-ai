@@ -4,7 +4,7 @@ use std::path::PathBuf;
 /// A CLI application to traverse files in a folder and concatenate them
 /// into a single text file, suitable for GenAI model input.
 #[derive(Parser, Debug, Clone)]
-#[command(author, version, about, long_about = None)]
+#[command(author, version, about, long_about = None, color = clap::ColorChoice::Always)]
 pub struct Args {
     /// The input folder to traverse for files
     #[arg(required = true)]
