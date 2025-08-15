@@ -9,6 +9,7 @@ edition = "2024"
 description = "A tool to traverse files in a folder and concatenate them into a single text file for GenAI models."
 
 [dependencies]
+anstyle = "1.0.11"
 anyhow = "1.0.99"
 clap = { version = "4.5.45", features = ["derive", "color"] }
 content_inspector = "0.2.4"
