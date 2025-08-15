@@ -4,7 +4,7 @@ authors = ["Luiz Otavio Vilas Boas Oliveira <luiz.vbo@gmail.com>"]
 license = "MIT"
 repository = "https://github.com/luizvbo/join-ai"
 readme = "README.md"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 description = "A tool to traverse files in a folder and concatenate them into a single text file for GenAI models."
 
