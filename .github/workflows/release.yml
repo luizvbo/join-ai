@@ -1,13 +1,14 @@
+# FILE: .github/workflows/release.yml
 name: Release
 
 on:
-  push:
-    tags:
-      - "v[0-9]+.[0-9]+.[0-9]+"
+  release:
+    types: [created]
 
 jobs:
   publish-to-crates:
     name: Publish to crates.io
+    if: startsWith(github.event.release.tag_name, 'v')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -16,12 +17,20 @@ jobs:
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Publish to crates.io
+      # Step 1: This step runs ONLY if it's a pre-release
+      - name: Dry-run publish to crates.io (Pre-release)
+        if: github.event.release.prerelease
+        run: cargo publish --token ${{ secrets.CARGO_API_TOKEN }} --dry-run
+
+      # Step 2: This step runs ONLY if it is NOT a pre-release
+      - name: Publish to crates.io (Full Release)
+        if: '!github.event.release.prerelease'
         run: cargo publish --token ${{ secrets.CARGO_API_TOKEN }}
 
   create-release-artifacts:
     name: Create Release Artifacts
     needs: publish-to-crates
+    if: startsWith(github.event.release.tag_name, 'v')
     strategy:
       matrix:
         include:
@@ -37,6 +46,7 @@ jobs:
             os: windows-latest
     runs-on: ${{ matrix.os }}
     steps:
+      # ... (all the build and upload steps remain exactly the same) ...
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -59,7 +69,6 @@ jobs:
       - name: Prepare artifacts for release
         shell: bash
         run: |
-          # The executable name is 'join-ai' on Linux/macOS and 'join-ai.exe' on Windows
           ARTIFACT_NAME="join-ai-${{ matrix.target }}"
           EXECUTABLE_PATH="./target/${{ matrix.target }}/release/join-ai"
 
