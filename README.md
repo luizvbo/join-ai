@@ -52,34 +52,35 @@ from crates.io on any supported platform:
 cargo install join-ai
 ```
 
-## Usage Examples
+## Usage
 
-#### 1. Concatenate a Rust Project
-
-This will find all `.rs` and `.toml` files in the current directory (`.`),
-exclude the `target` and `.git` folders, and save the result to
-`rust_project.txt`.
-
-```bash
-join-ai -p "*.rs" -p "*.toml" -e target -e .git -o rust_project.txt .
+```sh
+join-ai <COMMAND>
 ```
 
-#### 2. Concatenate a Python Project
+### Commands
 
-This will find all `.py` files, excluding the virtual environment folder, and
-use the default output file `concatenated.txt`.
+-   `join`: Concatenate files from a directory into a single output file.
+-   `update`: Check for new releases and update the application (not yet implemented).
 
-```bash
-join-ai -p "*.py" -e .venv .
+### Examples
+
+**Concatenate all files in the current directory:**
+
+```sh
+join-ai join . --output all-code.txt
 ```
 
-#### 3. Concatenate Web Project Files
+**Concatenate only Rust (`.rs`) and Markdown (`.md`) files:**
 
-This will find all JavaScript, HTML, and CSS files, excluding the
-`node_modules` directory.
+```sh
+join-ai join . -p "*.rs" -p "*.md"
+```
 
-```bash
-join-ai -p "*.js" -p "*.html" -p "*.css" -e node_modules .
+**Check for updates:**
+```sh
+join-ai update
+```
 ```
 
 ## Command-Line Options

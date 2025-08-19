@@ -1,7 +1,7 @@
 use anstyle::{AnsiColor, Color, Style};
 use clap::builder::styling::Styles;
 use clap::{CommandFactory, FromArgMatches};
-use join_ai::{cli::Args, run};
+use join_ai::{cli::Cli, run};
 
 // Function to create the cargo-like styles
 fn get_styles() -> Styles {
@@ -25,9 +25,9 @@ fn get_styles() -> Styles {
 }
 
 fn main() -> anyhow::Result<()> {
-    let mut cmd = Args::command();
+    let mut cmd = Cli::command();
     cmd = cmd.styles(get_styles());
     let matches = cmd.get_matches();
-    let args = Args::from_arg_matches(&matches)?;
-    run(args)
+    let cli = Cli::from_arg_matches(&matches)?;
+    run(cli.command)
 }
