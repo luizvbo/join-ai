@@ -48,16 +48,21 @@ jobs:
       - name: Prepare artifacts for release
         shell: bash
         run: |
-          ARTIFACT_NAME="join-ai-${{ matrix.target }}"
+          # Define a clean filename without any path prefixes
+          ARTIFACT_FILENAME="join-ai-${{ matrix.target }}"
           EXECUTABLE_PATH="./target/${{ matrix.target }}/release/join-ai"
 
           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            mv "${EXECUTABLE_PATH}.exe" "./${ARTIFACT_NAME}.exe"
-            echo "ASSET_PATH=./${ARTIFACT_NAME}.exe" >> $GITHUB_ENV
+            ARTIFACT_FILENAME="${ARTIFACT_FILENAME}.exe"
+            mv "${EXECUTABLE_PATH}.exe" "./${ARTIFACT_FILENAME}"
           else
-            mv "${EXECUTABLE_PATH}" "./${ARTIFACT_NAME}"
-            echo "ASSET_PATH=./${ARTIFACT_NAME}" >> $GITHUB_ENV
+            mv "${EXECUTABLE_PATH}" "./${ARTIFACT_FILENAME}"
           fi
+
+          # Set the asset path for finding the local file
+          echo "ASSET_PATH=./${ARTIFACT_FILENAME}" >> $GITHUB_ENV
+          # Set a clean asset name for the release upload
+          echo "ASSET_NAME=${ARTIFACT_FILENAME}" >> $GITHUB_ENV
 
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
@@ -66,7 +71,7 @@ jobs:
         with:
           upload_url: ${{ github.event.release.upload_url }}
           asset_path: ${{ env.ASSET_PATH }}
-          asset_name: ${{ env.ASSET_PATH }}
+          asset_name: ${{ env.ASSET_NAME }}
           asset_content_type: application/octet-stream
 
   publish-to-crates:
