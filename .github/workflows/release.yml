@@ -1,0 +1,90 @@
+name: Release
+
+on:
+  release:
+    types: [created]
+
+permissions:
+  contents: write
+
+jobs:
+  create-release-artifacts:
+    name: Build Release Artifacts
+    if: startsWith(github.event.release.tag_name, 'v')
+    strategy:
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+          - target: aarch64-unknown-linux-gnu
+            os: ubuntu-latest
+          - target: x86_64-apple-darwin
+            os: macos-latest
+          - target: aarch64-apple-darwin
+            os: macos-latest
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Setup cross-compilation for Linux aarch64
+        if: matrix.target == 'aarch64-unknown-linux-gnu'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu
+
+      - name: Build binary
+        run: cargo build --release --target ${{ matrix.target }}
+        env:
+          CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: aarch64-linux-gnu-gcc
+
+      - name: Prepare artifacts for release
+        shell: bash
+        run: |
+          ARTIFACT_NAME="join-ai-${{ matrix.target }}"
+          EXECUTABLE_PATH="./target/${{ matrix.target }}/release/join-ai"
+
+          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            mv "${EXECUTABLE_PATH}.exe" "./${ARTIFACT_NAME}.exe"
+            echo "ASSET_PATH=./${ARTIFACT_NAME}.exe" >> $GITHUB_ENV
+          else
+            mv "${EXECUTABLE_PATH}" "./${ARTIFACT_NAME}"
+            echo "ASSET_PATH=./${ARTIFACT_NAME}" >> $GITHUB_ENV
+          fi
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ${{ env.ASSET_PATH }}
+          asset_name: ${{ env.ASSET_PATH }}
+          asset_content_type: application/octet-stream
+
+  publish-to-crates:
+    name: Publish to crates.io
+    needs: create-release-artifacts
+    if: startsWith(github.event.release.tag_name, 'v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Dry-run publish to crates.io (Pre-release)
+        if: github.event.release.prerelease
+        run: cargo publish --token ${{ secrets.CARGO_API_TOKEN }} --dry-run
+
+      - name: Publish to crates.io (Full Release)
+        if: "!github.event.release.prerelease"
+        run: cargo publish --token ${{ secrets.CARGO_API_TOKEN }}
