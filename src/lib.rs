@@ -62,7 +62,6 @@ fn run_join(args: JoinArgs) -> anyhow::Result<()> {
     Ok(())
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
