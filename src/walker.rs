@@ -9,8 +9,8 @@ pub fn find_files(args: &JoinArgs) -> anyhow::Result<mpsc::Receiver<PathBuf>> {
     let input_folder = args.input_folder.clone();
 
     let mut walker_builder = WalkBuilder::new(&input_folder);
+    // REMOVED: .hidden(!args.hidden) -> This will be handled by the overrides below.
     walker_builder
-        .hidden(!args.hidden)
         .follow_links(!args.no_follow)
         .max_depth(args.max_depth);
 
@@ -22,6 +22,12 @@ pub fn find_files(args: &JoinArgs) -> anyhow::Result<mpsc::Receiver<PathBuf>> {
         }
     } else {
         override_builder.add("*")?; // Default to including all files if no pattern is given
+    }
+
+    // ADDED: If hidden files are not requested, explicitly add a glob to ignore them.
+    // This is needed because the "*" override above would otherwise include them.
+    if !args.hidden {
+        override_builder.add("!.*")?;
     }
 
     if let Some(exclude_folders) = &args.exclude_folders {
