@@ -61,3 +61,121 @@ pub struct JoinArgs {
 /// Arguments for the 'update' command
 #[derive(ClapArgs, Debug, Clone)]
 pub struct UpdateArgs {}
+
+#[cfg(test)]
+mod tests {
+    use super::*; // Import all items from the parent cli module
+    use clap::error::ErrorKind; // Import the ErrorKind enum
+
+    #[test]
+    fn test_basic_join_command_and_defaults() {
+        let args = vec!["join-ai", "join", "./my-project"];
+        let cli = Cli::try_parse_from(args).unwrap();
+
+        match cli.command {
+            Commands::Join(join_args) => {
+                assert_eq!(join_args.input_folder, PathBuf::from("./my-project"));
+                // Assert default values
+                assert_eq!(join_args.output_file, PathBuf::from("concatenated.txt"));
+                assert!(!join_args.clear_file);
+                assert!(!join_args.hidden);
+                assert!(join_args.patterns.is_none());
+                assert!(join_args.exclude_folders.is_none());
+                assert!(join_args.exclude_extensions.is_none());
+                assert!(join_args.max_depth.is_none());
+                assert!(join_args.no_follow); // Default is true
+            }
+            _ => panic!("Expected Join command to be parsed"),
+        }
+    }
+
+    #[test]
+    fn test_all_join_options_are_parsed() {
+        let args = vec![
+            "join-ai",
+            "join",
+            "src",
+            "-o",
+            "output.txt",
+            "-p",
+            "*.rs",
+            "-p",
+            "*.toml",
+            "--clear-file",
+            "-e",
+            "target",
+            "--exclude-folders",
+            ".git", // Test long name for exclude
+            "--exclude-extensions",
+            "log",
+            "--exclude-extensions",
+            "tmp",
+            "--max-depth",
+            "10",
+            "--hidden",
+            // We omit --no-follow to ensure the default is still applied
+        ];
+        let cli = Cli::try_parse_from(args).unwrap();
+
+        match cli.command {
+            Commands::Join(join_args) => {
+                assert_eq!(join_args.input_folder, PathBuf::from("src"));
+                assert_eq!(join_args.output_file, PathBuf::from("output.txt"));
+                assert_eq!(
+                    join_args.patterns,
+                    Some(vec!["*.rs".to_string(), "*.toml".to_string()])
+                );
+                assert!(join_args.clear_file);
+                assert_eq!(
+                    join_args.exclude_folders,
+                    Some(vec!["target".to_string(), ".git".to_string()])
+                );
+                assert_eq!(
+                    join_args.exclude_extensions,
+                    Some(vec!["log".to_string(), "tmp".to_string()])
+                );
+                assert_eq!(join_args.max_depth, Some(10));
+                assert!(join_args.hidden);
+                assert!(join_args.no_follow);
+            }
+            _ => panic!("Expected Join command to be parsed"),
+        }
+    }
+
+    #[test]
+    fn test_update_subcommand_is_parsed() {
+        let args = vec!["join-ai", "update"];
+        let cli = Cli::try_parse_from(args).unwrap();
+
+        assert!(matches!(cli.command, Commands::Update(_)));
+    }
+
+    #[test]
+    fn test_missing_required_argument_fails() {
+        // Missing the required `input_folder` argument
+        let args = vec!["join-ai", "join", "-o", "output.txt"];
+        let result = Cli::try_parse_from(args);
+
+        assert!(
+            result.is_err(),
+            "Parsing should fail without the required input_folder"
+        );
+        assert_eq!(
+            result.unwrap_err().kind(),
+            ErrorKind::MissingRequiredArgument
+        );
+    }
+
+    #[test]
+    fn test_no_subcommand_fails() {
+        let args = vec!["join-ai"];
+        let result = Cli::try_parse_from(args);
+
+        assert!(result.is_err(), "Parsing should fail without a subcommand");
+        // THIS IS THE FIX: Assert against the correct ErrorKind
+        assert_eq!(
+            result.unwrap_err().kind(),
+            ErrorKind::DisplayHelpOnMissingArgumentOrSubcommand
+        );
+    }
+}
