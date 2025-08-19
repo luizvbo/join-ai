@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# join-ai installer script
+# join-ai installer script for macOS and Linux
 #
 # This script is designed to be run via curl:
 #   sh -c "$(curl -fsSL https://raw.githubusercontent.com/luizvbo/join-ai/main/install.sh)"
@@ -23,59 +23,102 @@ get_os_arch() {
             case "$MACHINE_ARCH" in
                 x86_64) TARGET="x86_64-unknown-linux-gnu" ;;
                 aarch64) TARGET="aarch64-unknown-linux-gnu" ;;
-                *) echo "Error: Unsupported architecture ($MACHINE_ARCH) for Linux."; exit 1 ;;
+                *) echo "Error: Unsupported architecture ($MACHINE_ARCH) for Linux." >&2; exit 1 ;;
             esac
             ;;
         darwin)
             case "$MACHINE_ARCH" in
                 x86_64) TARGET="x86_64-apple-darwin" ;;
                 arm64) TARGET="aarch64-apple-darwin" ;;
-                *) echo "Error: Unsupported architecture ($MACHINE_ARCH) for macOS."; exit 1 ;;
+                *) echo "Error: Unsupported architecture ($MACHINE_ARCH) for macOS." >&2; exit 1 ;;
             esac
             ;;
         *)
-            echo "Error: Unsupported operating system ($OS_TYPE). Only Linux and macOS are supported by this script."
+            echo "Error: This installer script supports macOS and Linux only." >&2
+            echo "For Windows, please download the binary from the GitHub Releases page." >&2
             exit 1
             ;;
     esac
     echo "$TARGET"
 }
 
-# Get the target triple
-TARGET=$(get_os_arch)
-echo "Detected target: $TARGET"
+# Find a writable directory in PATH, prioritizing user-local bins
+find_install_dir() {
+    # Prefer user-local bin directories
+    if [ -d "$HOME/.local/bin" ] && [ -w "$HOME/.local/bin" ]; then
+        echo "$HOME/.local/bin"
+        return
+    fi
+    if [ -d "$HOME/bin" ] && [ -w "$HOME/bin" ]; then
+        echo "$HOME/bin"
+        return
+    fi
+    
+    # Fallback to system-wide directory (might require sudo)
+    if [ -d "/usr/local/bin" ] && [ -w "/usr/local/bin" ]; then
+        echo "/usr/local/bin"
+        return
+    fi
 
-# Get the latest release tag from GitHub API
-LATEST_TAG=$(curl -s "https://api.github.com/repos/$REPO/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
-if [ -z "$LATEST_TAG" ]; then
-    echo "Error: Could not determine the latest release version."
-    exit 1
-fi
-echo "Latest version: $LATEST_TAG"
+    echo ""
+}
 
-# Construct the download URL
-DOWNLOAD_URL="https://github.com/$REPO/releases/download/$LATEST_TAG/$BINARY_NAME-$TARGET"
+main() {
+    TARGET=$(get_os_arch)
+    echo "Detected target: $TARGET"
 
-# Define the installation directory
-INSTALL_DIR="/usr/local/bin"
+    LATEST_TAG=$(curl -s "https://api.github.com/repos/$REPO/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+    if [ -z "$LATEST_TAG" ]; then
+        echo "Error: Could not determine the latest release version." >&2
+        exit 1
+    fi
+    echo "Latest version: $LATEST_TAG"
 
-# Download and install the binary
-echo "Downloading from: $DOWNLOAD_URL"
-# The -L flag for curl is important to follow redirects
-curl -L --progress-bar "$DOWNLOAD_URL" -o "$BINARY_NAME"
+    DOWNLOAD_URL="https://github.com/$REPO/releases/download/$LATEST_TAG/$BINARY_NAME-$TARGET"
+    
+    # Create a temporary directory for the download
+    TMP_DIR=$(mktemp -d)
+    # Ensure the temporary directory is cleaned up on exit
+    trap 'rm -rf "$TMP_DIR"' EXIT
 
-# Make the binary executable
-chmod +x "$BINARY_NAME"
+    echo "Downloading from: $DOWNLOAD_URL"
+    curl -L --progress-bar "$DOWNLOAD_URL" -o "$TMP_DIR/$BINARY_NAME"
+    chmod +x "$TMP_DIR/$BINARY_NAME"
 
-# Move the binary to the installation directory (requires sudo)
-echo "Installing to $INSTALL_DIR..."
-if [ -w "$INSTALL_DIR" ]; then
-    mv "$BINARY_NAME" "$INSTALL_DIR/$BINARY_NAME"
+    # Determine installation directory
+    INSTALL_DIR=$(find_install_dir)
+
+    if [ -n "$INSTALL_DIR" ]; then
+        echo "Installing to $INSTALL_DIR..."
+        mv "$TMP_DIR/$BINARY_NAME" "$INSTALL_DIR/$BINARY_NAME"
+    else
+        echo "Could not find a writable installation directory in your PATH." >&2
+        echo "Attempting to install with sudo to /usr/local/bin..." >&2
+        if [ ! -d "/usr/local/bin" ]; then
+            sudo mkdir -p "/usr/local/bin"
+        fi
+        sudo mv "$TMP_DIR/$BINARY_NAME" "/usr/local/bin/$BINARY_NAME"
+        INSTALL_DIR="/usr/local/bin"
+    fi
+
+    # Check if the installation directory is in the user's PATH
+    case ":$PATH:" in
+        *":$INSTALL_DIR:"*)
+            # In PATH
+            ;;
+        *)
+            # Not in PATH, print a warning
+            echo ""
+            echo "⚠️  Warning: The directory $INSTALL_DIR is not in your PATH."
+            echo "You will need to add it to your shell's configuration file to run '$BINARY_NAME' directly."
+            echo "For example, add the following line to your ~/.bashrc or ~/.zshrc:"
+            echo "  export PATH=\"\$PATH:$INSTALL_DIR\""
+            echo ""
+            ;;
+    esac
+
     echo "✅ $BINARY_NAME has been installed successfully to $INSTALL_DIR"
     echo "You can now run '$BINARY_NAME --help'"
-else
-    echo "Attempting to install with sudo..."
-    sudo mv "$BINARY_NAME" "$INSTALL_DIR/$BINARY_NAME"
-    echo "✅ $BINARY_NAME has been installed successfully to $INSTALL_DIR"
-    echo "You can now run '$BINARY_NAME --help'"
-fi
+}
+
+main
