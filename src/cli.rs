@@ -1,11 +1,26 @@
-use clap::{ColorChoice, Parser};
+use clap::{Args as ClapArgs, ColorChoice, Parser, Subcommand};
 use std::path::PathBuf;
 
 /// A CLI application to traverse files in a folder and concatenate them
 /// into a single text file, suitable for GenAI model input.
 #[derive(Parser, Debug, Clone)]
 #[command(author, version, about, long_about = None, color = ColorChoice::Always)]
-pub struct Args {
+pub struct Cli {
+    #[command(subcommand)]
+    pub command: Commands,
+}
+
+#[derive(Subcommand, Debug, Clone)]
+pub enum Commands {
+    /// Concatenate files into a single text file
+    Join(JoinArgs),
+    /// Update the application to the latest version [placeholder]
+    Update(UpdateArgs),
+}
+
+/// Arguments for the 'join' command
+#[derive(ClapArgs, Debug, Clone)]
+pub struct JoinArgs {
     /// The input folder to traverse for files
     #[arg(required = true)]
     pub input_folder: PathBuf,
@@ -42,3 +57,7 @@ pub struct Args {
     #[arg(long, default_value_t = true)]
     pub no_follow: bool,
 }
+
+/// Arguments for the 'update' command
+#[derive(ClapArgs, Debug, Clone)]
+pub struct UpdateArgs {}

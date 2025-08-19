@@ -1,10 +1,10 @@
-use crate::cli::Args;
+use crate::cli::JoinArgs;
 use ignore::{WalkBuilder, WalkState};
 use std::path::PathBuf;
 use std::sync::mpsc;
 
 /// Sets up and runs the file walker, sending valid file paths through a channel.
-pub fn find_files(args: &Args) -> anyhow::Result<mpsc::Receiver<PathBuf>> {
+pub fn find_files(args: &JoinArgs) -> anyhow::Result<mpsc::Receiver<PathBuf>> {
     let (tx, rx) = mpsc::channel();
     let input_folder = args.input_folder.clone();
 

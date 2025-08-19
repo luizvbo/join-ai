@@ -1,13 +1,27 @@
+// FILE: ./src/lib.rs
 use std::fs;
 
 pub mod cli;
 pub mod processor;
 pub mod walker;
 
-use cli::Args;
+use cli::{Commands, JoinArgs};
 
 /// The core logic of the application.
-pub fn run(args: Args) -> anyhow::Result<()> {
+pub fn run(command: Commands) -> anyhow::Result<()> {
+    match command {
+        Commands::Join(args) => run_join(args),
+        Commands::Update(_args) => {
+            println!("Update functionality is not yet implemented.");
+            println!("Please check for new releases at the GitHub repository:");
+            println!("https://github.com/luizvbo/join-ai/releases");
+            Ok(())
+        }
+    }
+}
+
+/// The logic for the 'join' command.
+fn run_join(args: JoinArgs) -> anyhow::Result<()> {
     // Log the arguments being used
     println!(
         "Processing files in folder: {}",
@@ -48,18 +62,19 @@ pub fn run(args: Args) -> anyhow::Result<()> {
     Ok(())
 }
 
+
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::cli::Args;
+    use crate::cli::{Commands, JoinArgs};
     use assert_fs::TempDir;
     use assert_fs::prelude::*;
     use std::fs::File;
     use std::io::Read;
     use std::path::Path;
 
-    fn get_test_args(input_folder: &Path, output_file: &Path) -> Args {
-        Args {
+    fn get_test_args(input_folder: &Path, output_file: &Path) -> JoinArgs {
+        JoinArgs {
             input_folder: input_folder.to_path_buf(),
             output_file: output_file.to_path_buf(),
             patterns: None,
@@ -85,10 +100,9 @@ mod tests {
 
         let output_file = input_dir_path.join("output.txt");
         let mut args = get_test_args(input_dir_path, &output_file);
-        // This now reflects the new CLI behavior
         args.patterns = Some(vec!["*.rs".to_string(), "*.toml".to_string()]);
 
-        run(args)?;
+        run(Commands::Join(args))?;
 
         let mut result = String::new();
         File::open(&output_file)?.read_to_string(&mut result)?;
@@ -106,14 +120,13 @@ mod tests {
         let input_dir_path = dir.path();
 
         dir.child("text.txt").write_str("some text")?;
-        // A file containing a NUL byte is considered binary for our purposes.
         dir.child("binary.bin")
             .write_binary(&[b'b', b'i', b'n', 0, b'a', b'r', b'y'])?;
 
         let output_file = input_dir_path.join("output.txt");
         let args = get_test_args(input_dir_path, &output_file);
 
-        run(args)?;
+        run(Commands::Join(args))?;
 
         let mut result = String::new();
         File::open(&output_file)?.read_to_string(&mut result)?;
