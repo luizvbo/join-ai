@@ -97,94 +97,102 @@ impl Default for LanguageDB {
 pub fn strip_comments(contents: &[u8], lang: Arc<Language>) -> Vec<u8> {
     let mut output = Vec::with_capacity(contents.len());
     let mut cursor = 0;
-    let mut comment_stack: Vec<String> = Vec::new();
-    let mut string_delimiter: Option<String> = None;
+    let mut comment_stack: Vec<String> = Vec::new(); // Stores END delimiters
+    let mut string_delimiter: Option<String> = None; // Stores END delimiter
 
     while cursor < contents.len() {
         let remaining = &contents[cursor..];
 
+        // STATE 1: Inside a string. Highest priority.
         if let Some(delim) = &string_delimiter {
-            // --- We are inside a string ---
             if remaining.starts_with(delim.as_bytes()) {
-                // End of string
                 output.extend_from_slice(delim.as_bytes());
                 cursor += delim.len();
                 string_delimiter = None;
             } else if remaining.starts_with(b"\\") && remaining.len() > 1 {
-                // Escaped character
-                output.extend_from_slice(&remaining[0..2]);
+                output.extend_from_slice(&remaining[0..2]); // Escaped char
                 cursor += 2;
             } else {
-                // Normal character in string
-                output.push(remaining[0]);
+                output.push(remaining[0]); // Normal char in string
                 cursor += 1;
             }
-        } else if let Some(end_delim) = comment_stack.last() {
-            // --- We are inside a multi-line comment ---
+            continue;
+        }
+
+        // STATE 2: Inside a multi-line comment.
+        if let Some(end_delim) = comment_stack.last() {
+            // Check for end of comment first.
             if remaining.starts_with(end_delim.as_bytes()) {
                 cursor += end_delim.len();
                 comment_stack.pop();
-            } else {
-                cursor += 1; // Consume character without adding to output
-            }
-        } else {
-            // --- We are in code ---
-            let mut next_delimiter_pos: Option<usize> = None;
-
-            // Find the earliest next delimiter (comment or string)
-            let mut all_delims = Vec::new();
-            all_delims.extend(lang.line_comments.iter());
-            all_delims.extend(lang.multi_line_comments.iter().map(|(s, _)| s));
-            all_delims.extend(lang.quotes.iter().map(|(s, _)| s));
-
-            for delim in &all_delims {
-                if let Some(pos) = find_subsequence(remaining, delim.as_bytes()) {
-                    next_delimiter_pos = Some(next_delimiter_pos.map_or(pos, |p| p.min(pos)));
-                }
+                continue;
             }
 
-            if let Some(pos) = next_delimiter_pos {
-                // Append the code before the delimiter
-                output.extend_from_slice(&remaining[..pos]);
-                cursor += pos;
-
-                // Update state based on the delimiter we found
-                let remaining_at_delim = &contents[cursor..];
-                if let Some(_delim) = lang
-                    .line_comments
-                    .iter()
-                    .find(|d| remaining_at_delim.starts_with(d.as_bytes()))
-                {
-                    // It's a line comment, skip to the end of the line
-                    if let Some(end_of_line) = find_subsequence(remaining_at_delim, b"\n") {
-                        cursor += end_of_line; // The newline will be handled in the next iteration
-                    } else {
-                        cursor = contents.len(); // End of file
-                    }
-                } else if let Some((start, end)) = lang
+            // If nesting is allowed, check for a new comment start.
+            if lang.allows_nested
+                && let Some((start, end)) = lang
                     .multi_line_comments
                     .iter()
-                    .find(|(s, _)| remaining_at_delim.starts_with(s.as_bytes()))
-                {
-                    if comment_stack.is_empty() || lang.allows_nested {
-                        comment_stack.push(end.clone());
-                    }
-                    cursor += start.len();
-                } else if let Some((start, end)) = lang
-                    .quotes
-                    .iter()
-                    .find(|(s, _)| remaining_at_delim.starts_with(s.as_bytes()))
-                {
-                    string_delimiter = Some(end.clone());
-                    output.extend_from_slice(start.as_bytes());
-                    cursor += start.len();
-                }
+                    .find(|(s, _)| remaining.starts_with(s.as_bytes()))
+            {
+                comment_stack.push(end.clone());
+                cursor += start.len();
+                continue;
+            }
+
+            // Preserve newline for layout, otherwise just consume the character.
+            if remaining[0] == b'\n' {
+                output.push(b'\n');
+            }
+            cursor += 1;
+            continue;
+        }
+
+        // STATE 3: In normal code. Check for starts of delimiters.
+
+        // Check for line comments.
+        if let Some(_delim) = lang
+            .line_comments
+            .iter()
+            .find(|d| remaining.starts_with(d.as_bytes()))
+        {
+            if let Some(eol_pos) = find_subsequence(remaining, b"\n") {
+                // Skip the content of the comment, up to the newline.
+                // The newline character itself will be handled by the next loop iteration.
+                cursor += eol_pos;
             } else {
-                // No more delimiters, append the rest of the file
-                output.extend_from_slice(remaining);
+                // No newline found, comment goes to the end of the file.
                 cursor = contents.len();
             }
+            continue;
         }
+
+        // Check for multi-line comments.
+        if let Some((start, end)) = lang
+            .multi_line_comments
+            .iter()
+            .find(|(s, _)| remaining.starts_with(s.as_bytes()))
+        {
+            comment_stack.push(end.clone());
+            cursor += start.len();
+            continue;
+        }
+
+        // Check for strings.
+        if let Some((start, end)) = lang
+            .quotes
+            .iter()
+            .find(|(s, _)| remaining.starts_with(s.as_bytes()))
+        {
+            string_delimiter = Some(end.clone());
+            output.extend_from_slice(start.as_bytes());
+            cursor += start.len();
+            continue;
+        }
+
+        // No delimiter found, so it's a normal character.
+        output.push(remaining[0]);
+        cursor += 1;
     }
 
     output
@@ -241,8 +249,10 @@ int main() {
     return 0; /* trailing comment */
 }
 "#;
+        // The newlines from the block comment are preserved, which is correct.
         let expected = r#"
 int main() {
+
     return 0;
 }
 "#;
@@ -256,7 +266,9 @@ int main() {
 def main():
     print("hello") # print statement
 "#;
+        // The line with the comment becomes a blank line.
         let expected = r#"
+
 def main():
     print("hello")
 "#;
@@ -300,7 +312,10 @@ And a block comment too
 */
 fn test() {}
 "#;
+        // Newlines inside the comments are preserved.
         let expected = r#"
+
+
 
 fn test() {}
 "#;
@@ -309,7 +324,8 @@ fn test() {}
 
     #[test]
     fn preserves_comment_syntax_in_string() {
-        // This test now asserts the CORRECT behavior: strings are preserved.
+        // This test now correctly asserts that the line comment is stripped
+        // because it is NOT inside a string.
         let input = r#"
 let url = "http://example.com"; // This is a URL
 let path = "C://Users/test";
@@ -332,6 +348,7 @@ fn main() {
 
 }
 "#;
+        // The line containing the comment becomes a blank line.
         let expected = r#"
 fn main() {
 
@@ -350,8 +367,10 @@ fn main() {
     /* start of comment
     and it never ends...
 "#;
+        // Newlines inside the unclosed comment are preserved.
         let expected = r#"
 fn main() {
+
 "#;
         assert_stripped("rs", input, expected);
     }
