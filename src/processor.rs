@@ -5,7 +5,8 @@ use std::sync::mpsc;
 
 use once_cell::sync::Lazy;
 
-use crate::decommenter::{self, LanguageDB};
+use crate::decommenter::LanguageDB;
+use crate::decommenter::logic::remove_comments;
 
 static LANG_DB: Lazy<LanguageDB> = Lazy::new(LanguageDB::new);
 
@@ -13,7 +14,7 @@ static LANG_DB: Lazy<LanguageDB> = Lazy::new(LanguageDB::new);
 pub fn process_files(
     rx: mpsc::Receiver<PathBuf>,
     output_file_path: &PathBuf,
-    strip_comments: bool, // Renamed for clarity
+    strip_comments: bool,
 ) -> anyhow::Result<()> {
     let mut output_file = File::create(output_file_path)?;
 
@@ -35,7 +36,7 @@ pub fn process_files(
 
                     if let Some(lang) = lang_opt {
                         println!("Stripping comments from: {}", path.display());
-                        decommenter::strip_comments(&contents, lang)
+                        remove_comments(&contents, lang)
                     } else {
                         contents
                     }
