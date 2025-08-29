@@ -37,6 +37,10 @@ pub struct JoinArgs {
     #[arg(short, long)]
     pub clear_file: bool,
 
+    /// Strip comment lines from supported source code files
+    #[arg(long)]
+    pub strip_comments: bool,
+
     /// Folders to exclude from the search. Can be specified multiple times.
     #[arg(short, long, action = clap::ArgAction::Append)]
     pub exclude_folders: Option<Vec<String>>,

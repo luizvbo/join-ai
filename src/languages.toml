@@ -1,0 +1,1924 @@
+# This file defines the syntax characteristics for various programming languages.
+# It is used by the application to correctly identify and strip comments.
+# This file is a TOML conversion of the languages.json from the 'tokei' project.
+# https://github.com/XAMPPRocky/tokei
+
+[languages.Abap]
+name = "ABAP"
+line_comment = ["*", "\""]
+extensions = ["abap"]
+
+[languages.ABNF]
+line_comment = [";"]
+extensions = ["abnf"]
+
+[languages.ActionScript]
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["as"]
+
+[languages.Ada]
+line_comment = ["--"]
+extensions = ["ada", "adb", "ads", "pad"]
+
+[languages.Agda]
+nested = true
+line_comment = ["--"]
+multi_line_comments = [["{-", "-}"]]
+extensions = ["agda"]
+
+[languages.Alex]
+extensions = ["x"]
+
+[languages.Alloy]
+line_comment = ["--", "//"]
+multi_line_comments = [["/*", "*/"]]
+extensions = ["als"]
+
+[languages.Apl]
+name = "APL"
+line_comment = ["⍝"]
+extensions = ["apl", "aplf", "apls"]
+quotes = [["'", "'"]]
+
+[languages.Arduino]
+name = "Arduino C++"
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["ino"]
+
+[languages.Arturo]
+line_comment = [";"]
+quotes = [["\"", "\""]]
+extensions = ["art"]
+
+[languages.AsciiDoc]
+line_comment = ["//"]
+multi_line_comments = [["////", "////"]]
+extensions = ["adoc", "asciidoc"]
+
+[languages.Asn1]
+name = "ASN.1"
+line_comment = ["--"]
+quotes = [["\"", "'"], ["'", "'"]]
+multi_line_comments = [["/*", "*/"]]
+extensions = ["asn1"]
+
+[languages.Asp]
+name = "ASP"
+line_comment = ["'", "REM"]
+extensions = ["asa", "asp"]
+
+[languages.AspNet]
+name = "ASP.NET"
+multi_line_comments = [["<!--", "-->"], ["<%--", "-->"]]
+extensions = ["asax", "ascx", "asmx", "aspx", "master", "sitemap", "webinfo"]
+
+[languages.Assembly]
+line_comment = [";"]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["asm"]
+
+[languages.AssemblyGAS]
+name = "GNU Style Assembly"
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["s"]
+
+[languages.Astro]
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"], ["<!--", "-->"]]
+extensions = ["astro"]
+
+[languages.Ats]
+name = "ATS"
+line_comment = ["//"]
+multi_line_comments = [["(*", "*)"], ["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["dats", "hats", "sats", "atxt"]
+
+[languages.Autoconf]
+line_comment = ["#", "dnl"]
+extensions = ["in"]
+
+[languages.Autoit]
+line_comment = [";"]
+multi_line_comments = [["#comments-start", "#comments-end"], ["#cs", "#ce"]]
+extensions = ["au3"]
+
+[languages.AutoHotKey]
+line_comment = [";"]
+multi_line_comments = [["/*", "*/"]]
+extensions = ["ahk"]
+
+[languages.Automake]
+line_comment = ["#"]
+extensions = ["am"]
+
+[languages.AWK]
+line_comment = ["#"]
+shebangs = ["#!/bin/awk -f"]
+extensions = ["awk"]
+
+[languages.Ballerina]
+line_comment = ["//", "#"]
+quotes = [["\"", "'"], ["`", "`"]]
+extensions = ["bal"]
+
+[languages.Bash]
+name = "BASH"
+shebangs = ["#!/bin/bash"]
+line_comment = ["#"]
+quotes = [["\"", "'"], ["'", "'"]]
+env = ["bash"]
+extensions = ["bash"]
+
+[languages.Batch]
+line_comment = ["REM", "::"]
+extensions = ["bat", "btm", "cmd"]
+
+[languages.Bazel]
+line_comment = ["#"]
+doc_quotes = [['"""', '"""'], ["'''", "'''"]]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["bzl", "bazel", "bzlmod"]
+filenames = ["build", "workspace", "module"]
+
+[languages.Bean]
+line_comment = [";"]
+quotes = [["\"", "\""]]
+extensions = ["bean", "beancount"]
+
+[languages.Bicep]
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["'", "'"], ["'''", "'''"]]
+extensions = ["bicep", "bicepparam"]
+
+[languages.Bitbake]
+name = "Bitbake"
+line_comment = ["#"]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["bb", "bbclass", "bbappend", "inc"]
+
+[languages.Bqn]
+name = "BQN"
+line_comment = ["#"]
+extensions = ["bqn"]
+quotes = [["\"", "'"], ["'", "'"]]
+
+[languages.BrightScript]
+quotes = [["\"", "\""]]
+line_comment = ["'", "REM"]
+extensions = ["brs"]
+
+[languages.C]
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["c", "ec", "pgc"]
+
+[languages.Cabal]
+nested = true
+line_comment = ["--"]
+multi_line_comments = [["{-", "-}"]]
+extensions = ["cabal"]
+
+[languages.Cairo]
+line_comment = ["//"]
+extensions = ["cairo"]
+quotes = [["\"", "'"], ["'", "'"]]
+
+[languages.Cangjie]
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+nested = true
+quotes = [["\"", "'"], ['"""', '"""']]
+verbatim_quotes = [["#\"", "\"#"], ["##\"", "\"##"], ["###\"", "\"###"], ["#'", "'#"], ["##'", "'##"], ["###'", "'###"]]
+extensions = ["cj"]
+
+[languages.Cassius]
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["cassius"]
+
+[languages.Ceylon]
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "'"], ['"""', '"""']]
+extensions = ["ceylon"]
+
+[languages.Chapel]
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["chpl"]
+
+[languages.CHeader]
+name = "C Header"
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["h"]
+
+[languages.Cil]
+name = "CIL (SELinux)"
+line_comment = [";"]
+quotes = [["\"", "\""]]
+extensions = ["cil"]
+
+[languages.Circom]
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+extensions = ["circom"]
+
+[languages.Clojure]
+line_comment = [";"]
+quotes = [["\"", "\""]]
+extensions = ["clj"]
+
+[languages.ClojureC]
+line_comment = [";"]
+quotes = [["\"", "\""]]
+extensions = ["cljc"]
+
+[languages.ClojureScript]
+line_comment = [";"]
+quotes = [["\"", "\""]]
+extensions = ["cljs"]
+
+[languages.CMake]
+line_comment = ["#"]
+quotes = [["\"", "\""]]
+extensions = ["cmake"]
+filenames = ["cmakelists.txt"]
+
+[languages.Cobol]
+name = "COBOL"
+line_comment = ["*"]
+extensions = ["cob", "cbl", "ccp", "cobol", "cpy"]
+
+[languages.CodeQL]
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["ql", "qll"]
+
+[languages.CoffeeScript]
+line_comment = ["#"]
+multi_line_comments = [["###", "###"]]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["coffee", "cjsx"]
+
+[languages.Cogent]
+line_comment = ["--"]
+extensions = ["cogent"]
+
+[languages.ColdFusion]
+multi_line_comments = [["<!---", "--->"]]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["cfm"]
+
+[languages.ColdFusionScript]
+name = "ColdFusion CFScript"
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["cfc"]
+
+[languages.Coq]
+quotes = [["\"", "\""]]
+multi_line_comments = [["(*", "*)"]]
+extensions = ["v"]
+
+[languages.Cpp]
+name = "C++"
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+verbatim_quotes = [["R\"(", ")\""]]
+extensions = ["cc", "cpp", "cxx", "c++", "pcc", "tpp"]
+
+[languages.CppHeader]
+name = "C++ Header"
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["hh", "hpp", "hxx", "inl", "ipp"]
+
+[languages.Crystal]
+line_comment = ["#"]
+shebangs = ["#!/usr/bin/crystal"]
+quotes = [["\"", "'"], ["'", "'"]]
+env = ["crystal"]
+extensions = ["cr"]
+
+[languages.CSharp]
+name = "C#"
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+verbatim_quotes = [["@\"", "\""]]
+extensions = ["cs", "csx"]
+
+[languages.CShell]
+name = "C Shell"
+shebangs = ["#!/bin/csh"]
+line_comment = ["#"]
+env = ["csh"]
+extensions = ["csh"]
+
+[languages.Css]
+name = "CSS"
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "'"], ["'", "'"]]
+mime = ["text/css"]
+extensions = ["css"]
+
+[languages.Cuda]
+name = "CUDA"
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["cu"]
+
+[languages.Cue]
+name = "CUE"
+line_comment = ["//"]
+quotes = [["\"", "'"], ["'", "'"], ['"""', '"""']]
+verbatim_quotes = [["#\"", "\"#"]]
+extensions = ["cue"]
+
+[languages.Cython]
+line_comment = ["#"]
+doc_quotes = [['"""', '"""'], ["'''", "'''"]]
+quotes = [["\"", "'"], ["'", "'"]]
+env = ["cython"]
+extensions = ["pyx", "pxd", "pxi"]
+
+[languages.D]
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "'"], ["'", "'"]]
+nested_comments = [["/+", "+/"]]
+extensions = ["d"]
+
+[languages.D2]
+line_comment = ["#"]
+multi_line_comments = [['"""', '"""']]
+extensions = ["d2"]
+
+[languages.Daml]
+name = "DAML"
+nested = true
+line_comment = ["-- "]
+multi_line_comments = [["{-", "-}"]]
+extensions = ["daml"]
+
+[languages.Dart]
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "'"], ["'", "'"], ['"""', '"""'], ["'''", "'''"]]
+extensions = ["dart"]
+
+[languages.DeviceTree]
+name = "Device Tree"
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["dts", "dtsi"]
+
+[languages.Dhall]
+nested = true
+line_comment = ["--"]
+multi_line_comments = [["{-", "-}"]]
+quotes = [["\"", "'"], ["''", "''"]]
+extensions = ["dhall"]
+
+[languages.Dockerfile]
+line_comment = ["#"]
+extensions = ["dockerfile", "dockerignore"]
+filenames = ["dockerfile"]
+quotes = [["\"", "'"], ["'", "'"]]
+
+[languages.DotNetResource]
+name = ".NET Resource"
+multi_line_comments = [["<!--", "-->"]]
+quotes = [["\"", "\""]]
+extensions = ["resx"]
+
+[languages.DreamMaker]
+name = "Dream Maker"
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+nested = true
+extensions = ["dm", "dme"]
+quotes = [["\"", "'"], ["{\"", "\"}"]]
+
+[languages.Dust]
+name = "Dust.js"
+multi_line_comments = [["{!", "!}"]]
+extensions = ["dust"]
+
+[languages.Ebuild]
+line_comment = ["#"]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["ebuild", "eclass"]
+
+[languages.EdgeQL]
+name = "EdgeQL"
+line_comment = ["#"]
+quotes = [["'", "'"], ["\"", "'"], ["$", "$"]]
+extensions = ["edgeql"]
+
+[languages.ESDL]
+name = "EdgeDB Schema Definition"
+line_comment = ["#"]
+quotes = [["'", "'"], ["\"", "'"]]
+extensions = ["esdl"]
+
+[languages.Edn]
+line_comment = [";"]
+extensions = ["edn"]
+
+[languages.Eighth]
+name = "8th"
+line_comment = ["\\ ", "-- "]
+multi_line_comments = [["(*", "*)"]]
+nested = true
+quotes = [["\"", "\""]]
+extensions = ["8th"]
+
+[languages.Elisp]
+name = "Emacs Lisp"
+line_comment = [";"]
+extensions = ["el"]
+
+[languages.Elixir]
+line_comment = ["#"]
+quotes = [['"""', '"""'], ["\"", "'"], ["'''", "'''"], ["'", "'"]]
+extensions = ["ex", "exs"]
+
+[languages.Elm]
+nested = true
+line_comment = ["--"]
+multi_line_comments = [["{-", "-}"]]
+extensions = ["elm"]
+
+[languages.Elvish]
+line_comment = ["#"]
+quotes = [["\"", "'"], ["'", "'"]]
+env = ["elvish"]
+extensions = ["elv"]
+
+[languages.EmacsDevEnv]
+name = "Emacs Dev Env"
+line_comment = [";"]
+extensions = ["ede"]
+
+[languages.Emojicode]
+line_comment = ["💭"]
+multi_line_comments = [["💭🔜", "🔚💭"], ["📗", "📗"], ["📘", "📘"]]
+quotes = [["❌🔤", "❌🔤"]]
+extensions = ["emojic", "🍇"]
+
+[languages.Erlang]
+line_comment = ["%"]
+extensions = ["erl", "hrl"]
+
+[languages.Factor]
+line_comment = ["!", "#!"]
+multi_line_comments = [["/*", "*/"]]
+extensions = ["factor"]
+
+[languages.FEN]
+name = "FEN"
+blank = true
+extensions = ["fen"]
+
+[languages.Fennel]
+line_comment = [";", ";;"]
+quotes = [["\"", "\""]]
+extensions = ["fnl"]
+
+[languages.Fish]
+shebangs = ["#!/bin/fish"]
+line_comment = ["#"]
+quotes = [["\"", "'"], ["'", "'"]]
+env = ["fish"]
+extensions = ["fish"]
+
+[languages.FlatBuffers]
+name = "FlatBuffers Schema"
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["fbs"]
+
+[languages.ForgeConfig]
+name = "Forge Config"
+line_comment = ["#", "~"]
+extensions = ["cfg"]
+
+[languages.Forth]
+line_comment = ["\\"]
+multi_line_comments = [["( ", ")"]]
+extensions = ["4th", "forth", "fr", "frt", "fth", "f83", "fb", "fpm", "e4", "rx", "ft"]
+
+[languages.FortranLegacy]
+name = "FORTRAN Legacy"
+line_comment = ["c", "C", "!", "*"]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["f", "for", "ftn", "f77", "pfo"]
+
+[languages.FortranModern]
+name = "FORTRAN Modern"
+line_comment = ["!"]
+quotes = [["\"", "\""]]
+extensions = ["f03", "f08", "f90", "f95", "fpp"]
+
+[languages.FreeMarker]
+multi_line_comments = [["<#--", "-->"]]
+extensions = ["ftl", "ftlh", "ftlx"]
+
+[languages.FSharp]
+name = "F#"
+line_comment = ["//"]
+multi_line_comments = [["(*", "*)"]]
+quotes = [["\"", "\""]]
+verbatim_quotes = [["@\"", "\""]]
+extensions = ["fs", "fsi", "fsx", "fsscript"]
+
+[languages.Fstar]
+name = "F*"
+quotes = [["\"", "\""]]
+line_comment = ["//"]
+multi_line_comments = [["(*", "*)"]]
+extensions = ["fst", "fsti"]
+
+[languages.Futhark]
+line_comment = ["--"]
+extensions = ["fut"]
+
+[languages.GDB]
+name = "GDB Script"
+line_comment = ["#"]
+extensions = ["gdb"]
+
+[languages.GdScript]
+name = "GDScript"
+line_comment = ["#"]
+quotes = [["\"", "'"], ["'", "'"], ['"""', '"""']]
+extensions = ["gd"]
+
+[languages.Gherkin]
+name = "Gherkin (Cucumber)"
+line_comment = ["#"]
+extensions = ["feature"]
+
+[languages.Gleam]
+name = "Gleam"
+line_comment = ["//", "///", "////"]
+quotes = [["\"", "\""]]
+extensions = ["gleam"]
+
+[languages.GlimmerJs]
+name = "Glimmer JS"
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"], ["<!--", "-->"]]
+quotes = [["\"", "'"], ["'", "'"], ["`", "`"]]
+important_syntax = ["<template", "<style"]
+extensions = ["gjs"]
+
+[languages.GlimmerTs]
+name = "Glimmer TS"
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"], ["<!--", "-->"]]
+quotes = [["\"", "'"], ["'", "'"], ["`", "`"]]
+important_syntax = ["<template", "<style"]
+extensions = ["gts"]
+
+[languages.Glsl]
+name = "GLSL"
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["vert", "tesc", "tese", "geom", "frag", "comp", "mesh", "task", "rgen", "rint", "rahit", "rchit", "rmiss", "rcall", "glsl"]
+
+[languages.Gml]
+name = "Gml"
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["gml"]
+
+[languages.Go]
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["go"]
+
+[languages.Gohtml]
+name = "Go HTML"
+multi_line_comments = [["<!--", "-->"], ["{{/*", "*/}}"]]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["gohtml"]
+
+[languages.Graphql]
+name = "GraphQL"
+quotes = [["\"", "'"], ['"""', '"""']]
+line_comment = ["#"]
+extensions = ["gql", "graphql"]
+
+[languages.Groovy]
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+env = ["groovy"]
+extensions = ["groovy", "grt", "gtpl", "gvy"]
+
+[languages.Gwion]
+line_comment = ["#!"]
+quotes = [["\"", "\""]]
+extensions = ["gw"]
+
+[languages.Haml]
+line_comment = ["-#"]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["haml"]
+
+[languages.Hamlet]
+multi_line_comments = [["<!--", "-->"]]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["hamlet"]
+
+[languages.Happy]
+extensions = ["y", "ly"]
+
+[languages.Handlebars]
+multi_line_comments = [["<!--", "-->"], ["{{!", "}}"]]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["hbs", "handlebars"]
+
+[languages.Haskell]
+nested = true
+line_comment = ["--"]
+multi_line_comments = [["{-", "-}"]]
+extensions = ["hs"]
+
+[languages.Haxe]
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["hx"]
+
+[languages.Hcl]
+name = "HCL"
+line_comment = ["#", "//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["hcl", "tf", "tfvars"]
+
+[languages.Headache]
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["ha"]
+
+[languages.Hex]
+name = "HEX"
+blank = true
+extensions = ["hex"]
+
+[languages.HiCad]
+name = "HICAD"
+line_comment = ["REM", "rem"]
+extensions = ["MAC", "mac"]
+
+[languages.Hlsl]
+name = "HLSL"
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["hlsl", "fx", "fxsub"]
+
+[languages.HolyC]
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["HC", "hc", "ZC", "zc"]
+
+[languages.Html]
+name = "HTML"
+multi_line_comments = [["<!--", "-->"]]
+quotes = [["\"", "'"], ["'", "'"]]
+kind = "html"
+important_syntax = ["<script", "<style"]
+mime = ["text/html"]
+extensions = ["html", "htm"]
+
+[languages.Hy]
+line_comment = [";"]
+extensions = ["hy"]
+
+[languages.Idris]
+line_comment = ["--"]
+multi_line_comments = [["{-", "-}"]]
+quotes = [["\"", "'"], ['"""', '"""']]
+extensions = ["idr", "lidr"]
+nested = true
+
+[languages.Ini]
+name = "INI"
+line_comment = [";", "#"]
+extensions = ["ini"]
+
+[languages.IntelHex]
+name = "Intel HEX"
+blank = true
+extensions = ["ihex"]
+
+[languages.Isabelle]
+line_comment = ["--"]
+multi_line_comments = [["{*", "*}"], ["(*", "*)"], ["‹", "›"], ["\\<open>", "\\<close>"]]
+quotes = [["''", "''"]]
+extensions = ["thy"]
+
+[languages.Jai]
+name = "JAI"
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["jai"]
+nested = true
+
+[languages.Janet]
+line_comment = ["#"]
+quotes = [["\"", "'"], ["'", "'"], ["`", "`"]]
+extensions = ["janet"]
+
+[languages.Java]
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["java"]
+
+[languages.JavaScript]
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "'"], ["'", "'"], ["`", "`"]]
+mime = ["application/javascript", "application/ecmascript", "application/x-ecmascript", "application/x-javascript", "text/javascript", "text/ecmascript", "text/javascript1.0", "text/javascript1.1", "text/javascript1.2", "text/javascript1.3", "text/javascript1.4", "text/javascript1.5", "text/jscript", "text/livescript", "text/x-ecmascript", "text/x-javascript"]
+extensions = ["cjs", "js", "mjs"]
+
+[languages.Jinja2]
+name = "Jinja2"
+blank = true
+extensions = ["j2", "jinja"]
+multi_line_comments = [["{#", "#}"]]
+
+[languages.Jq]
+name = "jq"
+line_comment = ["#"]
+quotes = [["\"", "\""]]
+extensions = ["jq"]
+
+[languages.JSLT]
+name = "JSLT"
+line_comment = ["//"]
+quotes = [["\"", "\""]]
+extensions = ["jslt"]
+
+[languages.Json]
+name = "JSON"
+blank = true
+mime = ["application/json", "application/manifest+json"]
+extensions = ["json"]
+
+[languages.Jsonnet]
+line_comment = ["//", "#"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["jsonnet", "libsonnet"]
+
+[languages.Jsx]
+name = "JSX"
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "'"], ["'", "'"], ["`", "`"]]
+extensions = ["jsx"]
+
+[languages.Julia]
+line_comment = ["#"]
+multi_line_comments = [["#=", "=#"]]
+quotes = [["\"", "'"], ['"""', '"""']]
+nested = true
+extensions = ["jl"]
+
+[languages.Julius]
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "'"], ["'", "'"], ["`", "`"]]
+extensions = ["julius"]
+
+[languages.Jupyter]
+name = "Jupyter Notebooks"
+extensions = ["ipynb"]
+
+[languages.Just]
+shebangs = ["#!/usr/bin/env just --justfile"]
+env = ["just"]
+line_comment = ["#"]
+extensions = ["just"]
+filenames = ["justfile"]
+
+[languages.K]
+name = "K"
+nested = true
+line_comment = ["/"]
+quotes = [["\"", "\""]]
+extensions = ["k"]
+
+[languages.KakouneScript]
+name = "Kakoune script"
+line_comment = ["#"]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["kak"]
+
+[languages.Kotlin]
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+nested = true
+quotes = [["\"", "'"], ['"""', '"""']]
+extensions = ["kt", "kts"]
+
+[languages.Ksh]
+name = "Korn shell"
+shebangs = ["#!/bin/ksh"]
+line_comment = ["#"]
+quotes = [["\"", "'"], ["'", "'"]]
+env = ["ksh"]
+extensions = ["ksh"]
+
+[languages.Lalrpop]
+name = "LALRPOP"
+line_comment = ["//"]
+extensions = ["lalrpop"]
+quotes = [["\"", "'"], ["#\"", "\"#"]]
+verbatim_quotes = [["r##\"", "\"##"], ["r#\"", "\"#"]]
+
+[languages.KvLanguage]
+name = "KV Language"
+line_comment = ["# "]
+doc_quotes = [['"""', '"""'], ["'''", "'''"]]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["kv"]
+
+[languages.Lean]
+line_comment = ["--"]
+multi_line_comments = [["/-", "-/"]]
+nested = true
+extensions = ["lean", "hlean"]
+
+[languages.Hledger]
+name = "hledger"
+line_comment = [";", "#"]
+multi_line_comments = [["comment", "end comment"]]
+nested = false
+extensions = ["hledger"]
+
+[languages.Less]
+name = "LESS"
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+extensions = ["less"]
+quotes = [["\"", "'"], ["'", "'"]]
+
+[languages.Lex]
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+extensions = ["l", "lex"]
+
+[languages.Liquid]
+name = "Liquid"
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["liquid"]
+multi_line_comments = [["<!--", "-->"], ["{% comment %}", "{% endcomment %}"]]
+
+[languages.LinguaFranca]
+name = "Lingua Franca"
+line_comment = ["//", "#"]
+important_syntax = ["{="]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+nested = true
+extensions = ["lf"]
+
+[languages.LinkerScript]
+name = "LD Script"
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["ld", "lds"]
+
+[languages.Lisp]
+name = "Common Lisp"
+line_comment = [";"]
+multi_line_comments = [["#|", "|#"]]
+nested = true
+extensions = ["lisp", "lsp", "asd"]
+
+[languages.LiveScript]
+line_comment = ["#"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["ls"]
+
+[languages.LLVM]
+line_comment = [";"]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["ll"]
+
+[languages.Logtalk]
+line_comment = ["%"]
+quotes = [["\"", "\""]]
+multi_line_comments = [["/*", "*/"]]
+extensions = ["lgt", "logtalk"]
+
+[languages.LolCode]
+name = "LOLCODE"
+line_comment = ["BTW"]
+quotes = [["\"", "\""]]
+multi_line_comments = [["OBTW", "TLDR"]]
+extensions = ["lol"]
+
+[languages.Lua]
+line_comment = ["--"]
+multi_line_comments = [["--[[", "]]"]]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["lua", "luau"]
+
+[languages.Lucius]
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["lucius"]
+
+[languages.M4]
+extensions = ["m4"]
+line_comment = ["#", "dnl"]
+quotes = [["`", "'"]]
+
+[languages.Madlang]
+extensions = ["mad"]
+line_comment = ["#"]
+multi_line_comments = [["{#", "#}"]]
+
+[languages.Makefile]
+line_comment = ["#"]
+extensions = ["makefile", "mak", "mk"]
+filenames = ["gnumakefile", "makefile"]
+
+[languages.Markdown]
+literate = true
+important_syntax = ["```"]
+extensions = ["md", "markdown"]
+
+[languages.Max]
+extensions = ["maxpat"]
+
+[languages.Mdx]
+name = "MDX"
+literate = true
+important_syntax = ["```"]
+extensions = ["mdx"]
+
+[languages.Menhir]
+nested = true
+quotes = [["\"", "\""]]
+line_comment = ["//"]
+multi_line_comments = [["(*", "*)"], ["/*", "*/"]]
+extensions = ["mll", "mly", "vy"]
+
+[languages.Meson]
+line_comment = ["#"]
+quotes = [["'", "'"], ["'''", "'''"]]
+filenames = ["meson.build", "meson_options.txt"]
+
+[languages.Metal]
+name = "Metal Shading Language"
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["metal"]
+
+[languages.Mint]
+blank = true
+extensions = ["mint"]
+
+[languages.Mlatu]
+line_comment = ["//"]
+quotes = [["\"", "\""]]
+extensions = ["mlt"]
+
+[languages.Modelica]
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["mo", "mos"]
+
+[languages.ModuleDef]
+name = "Module-Definition"
+extensions = ["def"]
+line_comment = [";"]
+
+[languages.Mojo]
+line_comment = ["#"]
+doc_quotes = [['"""', '"""'], ["'''", "'''"]]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["mojo", "🔥"]
+
+[languages.MonkeyC]
+name = "Monkey C"
+extensions = ["mc"]
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+
+[languages.MoonBit]
+line_comment = ["//"]
+quotes = [["\"", "\""]]
+extensions = ["mbt", "mbti"]
+
+[languages.MoonScript]
+line_comment = ["--"]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["moon"]
+
+[languages.MsBuild]
+name = "MSBuild"
+multi_line_comments = [["<!--", "-->"]]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["csproj", "vbproj", "fsproj", "props", "targets"]
+
+[languages.Mustache]
+multi_line_comments = [["{{!", "}}"]]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["mustache"]
+
+[languages.Nextflow]
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["nextflow", "nf"]
+
+[languages.Nim]
+line_comment = ["#"]
+quotes = [["\"", "'"], ['"""', '"""']]
+extensions = ["nim"]
+
+[languages.Nix]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+line_comment = ["#"]
+extensions = ["nix"]
+
+[languages.NotQuitePerl]
+name = "Not Quite Perl"
+line_comment = ["#"]
+multi_line_comments = [["=begin", "=end"]]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["nqp"]
+
+[languages.NuGetConfig]
+name = "NuGet Config"
+multi_line_comments = [["<!--", "-->"]]
+quotes = [["\"", "'"], ["'", "'"]]
+filenames = ["nuget.config", "packages.config", "nugetdefaults.config"]
+
+[languages.Nushell]
+line_comment = ["#"]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["nu"]
+
+[languages.ObjectiveC]
+name = "Objective-C"
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["m"]
+
+[languages.ObjectiveCpp]
+name = "Objective-C++"
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["mm"]
+
+[languages.OCaml]
+quotes = [["\"", "\""]]
+multi_line_comments = [["(*", "*)"]]
+extensions = ["ml", "mli", "re", "rei"]
+
+[languages.Odin]
+extensions = ["odin"]
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "'"], ["'", "'"]]
+
+[languages.OpenScad]
+name = "OpenSCAD"
+extensions = ["scad"]
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "'"], ["'", "'"]]
+
+[languages.OpenPolicyAgent]
+name = "Open Policy Agent"
+line_comment = ["#"]
+quotes = [["\"", "'"], ["`", "`"]]
+extensions = ["rego"]
+
+[languages.OpenCL]
+name = "OpenCL"
+multi_line_comments = [["/*", "*/"]]
+extensions = ["cl", "ocl"]
+
+[languages.OpenQasm]
+name = "OpenQASM"
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+extensions = ["qasm"]
+
+[languages.OpenType]
+name = "OpenType Feature File"
+line_comment = ["#"]
+extensions = ["fea"]
+
+[languages.Org]
+line_comment = ["# "]
+extensions = ["org"]
+
+[languages.Oz]
+line_comment = ["%"]
+quotes = [["\"", "\""]]
+multi_line_comments = [["/*", "*/"]]
+extensions = ["oz"]
+
+[languages.PacmanMakepkg]
+name = "Pacman's makepkg"
+line_comment = ["#"]
+quotes = [["\"", "'"], ["'", "'"]]
+filenames = ["pkgbuild"]
+
+[languages.Pan]
+line_comment = ["#"]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["pan", "tpl"]
+
+[languages.Pascal]
+nested = true
+line_comment = ["//"]
+multi_line_comments = [["{", "}"], ["(*", "*)"]]
+quotes = [["'", "'"]]
+extensions = ["pas"]
+
+[languages.Perl]
+shebangs = ["#!/usr/bin/perl"]
+line_comment = ["#"]
+multi_line_comments = [["=pod", "=cut"]]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["pl", "pm"]
+
+[languages.Pest]
+line_comment = ["//"]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["pest"]
+
+[languages.Phix]
+line_comment = ["--", "//", "#!"]
+multi_line_comments = [["/*", "*/"], ["--/*", "--*/"]]
+nested = true
+quotes = [["\"", "'"], ["'", "'"]]
+verbatim_quotes = [['"""', '"""'], ["`", "`"]]
+extensions = ["e", "exw"]
+
+[languages.Php]
+name = "PHP"
+line_comment = ["#", "//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["php"]
+
+[languages.PlantUml]
+name = "PlantUML"
+line_comment = ["'"]
+multi_line_comments = [["/'", "'/"]]
+quotes = [["\"", "\""]]
+extensions = ["puml"]
+
+[languages.Po]
+name = "PO File"
+line_comment = ["#"]
+extensions = ["po", "pot"]
+
+[languages.Poke]
+multi_line_comments = [["/*", "*/"]]
+extensions = ["pk"]
+
+[languages.Polly]
+multi_line_comments = [["<!--", "-->"]]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["polly"]
+
+[languages.Pony]
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+doc_quotes = [['"""', '"""']]
+extensions = ["pony"]
+
+[languages.PostCss]
+name = "PostCSS"
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["pcss", "sss"]
+
+[languages.PowerShell]
+line_comment = ["#"]
+multi_line_comments = [["<#", "#>"]]
+quotes = [["\"", "'"], ["'", "'"], ["\"@", "@\""], ["@'", "'@"]]
+extensions = ["ps1", "psm1", "psd1", "ps1xml", "cdxml", "pssc", "psc1"]
+
+[languages.PRACTICE]
+name = "Lauterbach PRACTICE Script"
+line_comment = [";", "//"]
+quotes = [["\"", "\""]]
+extensions = ["cmm"]
+
+[languages.Processing]
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["pde"]
+
+[languages.Prolog]
+line_comment = ["%"]
+quotes = [["\"", "\""]]
+multi_line_comments = [["/*", "*/"]]
+extensions = ["p", "pro"]
+
+[languages.PSL]
+name = "PSL Assertion"
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["psl"]
+
+[languages.Protobuf]
+name = "Protocol Buffers"
+line_comment = ["//"]
+extensions = ["proto"]
+
+[languages.Pug]
+line_comment = ["//", "//-"]
+quotes = [["#{\"", "\"}"]]
+extensions = ["pug"]
+
+[languages.Puppet]
+line_comment = ["#"]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["pp"]
+
+[languages.PureScript]
+nested = true
+line_comment = ["--"]
+multi_line_comments = [["{-", "-}"]]
+extensions = ["purs"]
+
+[languages.Pyret]
+line_comment = ["#"]
+multi_line_comments = [["#|", "|#"]]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["arr"]
+nested = true
+
+[languages.Python]
+line_comment = ["#"]
+doc_quotes = [['"""', '"""'], ["'''", "'''"]]
+quotes = [["\"", "'"], ["'", "'"]]
+env = ["python", "python2", "python3"]
+mime = ["text/x-python"]
+extensions = ["py", "pyw", "pyi"]
+
+[languages.PRQL]
+line_comment = ["#"]
+quotes = [["\"", "'"], ["'", "'"]]
+mime = ["application/prql"]
+extensions = ["prql"]
+
+[languages.Q]
+name = "Q"
+nested = true
+line_comment = ["/"]
+quotes = [["\"", "\""]]
+extensions = ["q"]
+
+[languages.Qcl]
+name = "QCL"
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["qcl"]
+
+[languages.Qml]
+name = "QML"
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["qml"]
+
+[languages.R]
+line_comment = ["#"]
+extensions = ["r"]
+
+[languages.Racket]
+line_comment = [";"]
+multi_line_comments = [["#|", "|#"]]
+nested = true
+env = ["racket"]
+extensions = ["rkt", "scrbl"]
+
+[languages.Rakefile]
+line_comment = ["#"]
+multi_line_comments = [["=begin", "=end"]]
+quotes = [["\"", "'"], ["'", "'"]]
+filenames = ["rakefile"]
+extensions = ["rake"]
+
+[languages.Raku]
+shebangs = ["#!/usr/bin/raku", "#!/usr/bin/perl6"]
+line_comment = ["#"]
+multi_line_comments = [["#`(", ")"], ["#`[", "]"], ["#`{", "}"], ["#`｢", "｣"]]
+nested = true
+quotes = [["\"", "'"], ["'", "'"]]
+verbatim_quotes = [["｢", "｣"]]
+doc_quotes = [["#|{", "}"], ["#={", "}"], ["#|(", ")"], ["#=(", ")"], ["#|[", "]"], ["#=[", "]"], ["#|｢", "｣"], ["#=｢", "｣"], ["=begin pod", "=end pod"], ["=begin code", "=end code"], ["=begin head", "=end head"], ["=begin item", "=end item"], ["=begin table", "=end table"], ["=begin defn", "=end defn"], ["=begin para", "=end para"], ["=begin comment", "=end comment"], ["=begin data", "=end data"], ["=begin DESCRIPTION", "=end DESCRIPTION"], ["=begin SYNOPSIS", "=end SYNOPSIS"], ["=begin ", "=end "]]
+env = ["raku", "perl6"]
+extensions = ["raku", "rakumod", "rakutest", "pm6", "pl6", "p6"]
+
+[languages.Razor]
+line_comment = ["//"]
+multi_line_comments = [["<!--", "-->"], ["@*", "*@"], ["/*", "*/"]]
+quotes = [["\"", "\""]]
+verbatim_quotes = [["@\"", "\""]]
+extensions = ["cshtml", "razor"]
+
+[languages.Redscript]
+name = "Redscript"
+line_comment = ["//", "///"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+nested = true
+extensions = ["reds"]
+
+[languages.Renpy]
+name = "Ren'Py"
+line_comment = ["#"]
+quotes = [["\"", "'"], ["'", "'"], ["`", "`"]]
+extensions = ["rpy"]
+
+[languages.ReScript]
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["res", "resi"]
+
+[languages.ReStructuredText]
+blank = true
+extensions = ["rst"]
+
+[languages.Roc]
+line_comment = ["#"]
+quotes = [["\"", "'"], ["'", "'"]]
+doc_quotes = [['"""', '"""']]
+extensions = ["roc"]
+
+[languages.RON]
+name = "Rusty Object Notation"
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+nested = true
+extensions = ["ron"]
+
+[languages.RPMSpecfile]
+name = "RPM Specfile"
+line_comment = ["#"]
+extensions = ["spec"]
+
+[languages.Ruby]
+line_comment = ["#"]
+multi_line_comments = [["=begin", "=end"]]
+quotes = [["\"", "'"], ["'", "'"]]
+env = ["ruby"]
+extensions = ["rb"]
+
+[languages.RubyHtml]
+name = "Ruby HTML"
+multi_line_comments = [["<!--", "-->"]]
+important_syntax = ["<script", "<style"]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["rhtml", "erb"]
+
+[languages.Rust]
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+nested = true
+important_syntax = ["///", "//!"]
+extensions = ["rs"]
+quotes = [["\"", "'"], ["#\"", "\"#"]]
+verbatim_quotes = [["r##\"", "\"##"], ["r#\"", "\"#"]]
+
+[languages.Sass]
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["sass", "scss"]
+
+[languages.Scala]
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["sc", "scala"]
+
+[languages.Scheme]
+line_comment = [";"]
+multi_line_comments = [["#|", "|#"]]
+nested = true
+extensions = ["scm", "ss"]
+
+[languages.Scons]
+line_comment = ["#"]
+quotes = [["\"", "'"], ["'", "'"], ['"""', '"""'], ["'''", "'''"]]
+filenames = ["sconstruct", "sconscript"]
+
+[languages.Sh]
+name = "Shell"
+shebangs = ["#!/bin/sh"]
+line_comment = ["#"]
+quotes = [["\"", "'"], ["'", "'"]]
+env = ["sh"]
+extensions = ["sh"]
+
+[languages.ShaderLab]
+name = "ShaderLab"
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["shader", "cginc"]
+
+[languages.SIL]
+name = "SIL"
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"], ["/+", "+/"]]
+quotes = [["\"", "'"], ["'", "'"], ["`", "`"]]
+extensions = ["sil"]
+
+[languages.Slang]
+name = "Slang"
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["slang"]
+
+[languages.Sml]
+name = "Standard ML (SML)"
+quotes = [["\"", "\""]]
+multi_line_comments = [["(*", "*)"]]
+extensions = ["sml"]
+
+[languages.Smalltalk]
+name = "Smalltalk"
+quotes = [["'", "'"]]
+multi_line_comments = [["\"\"", "\"\""]]
+extensions = ["cs.st", "pck.st"]
+
+[languages.Snakemake]
+line_comment = ["#"]
+doc_quotes = [['"""', '"""'], ["'''", "'''"]]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["smk", "rules"]
+filenames = ["snakefile"]
+
+[languages.Solidity]
+name = "Solidity"
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["sol"]
+
+[languages.SpecmanE]
+name = "Specman e"
+line_comment = ["--", "//"]
+multi_line_comments = [["'>", "<'"]]
+extensions = ["e"]
+
+[languages.Spice]
+name = "Spice Netlist"
+line_comment = ["*"]
+extensions = ["ckt"]
+
+[languages.Sql]
+name = "SQL"
+line_comment = ["--"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["'", "'"]]
+extensions = ["sql"]
+
+[languages.Sqf]
+name = "SQF"
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["sqf"]
+
+[languages.SRecode]
+name = "SRecode Template"
+line_comment = [";;"]
+extensions = ["srt"]
+
+[languages.Stan]
+line_comment = ["//", "#"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["stan"]
+
+[languages.Stata]
+line_comment = ["//", "*"]
+multi_line_comments = [["/*", "*/"]]
+extensions = ["do"]
+
+[languages.Stratego]
+name = "Stratego/XT"
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "'"], ["$[", "]"], ["$<", ">"], ["${", "}"]]
+extensions = ["str"]
+
+[languages.Stylus]
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["styl"]
+
+[languages.Svelte]
+multi_line_comments = [["<!--", "-->"]]
+important_syntax = ["<script", "<style"]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["svelte"]
+
+[languages.Svg]
+name = "SVG"
+multi_line_comments = [["<!--", "-->"]]
+quotes = [["\"", "'"], ["'", "'"]]
+mime = ["image/svg+xml"]
+extensions = ["svg"]
+
+[languages.Swift]
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+nested = true
+extensions = ["swift"]
+
+[languages.Swig]
+name = "SWIG"
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+nested = true
+extensions = ["swg", "i"]
+
+[languages.SystemVerilog]
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["sv", "svh"]
+
+[languages.Slint]
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["slint"]
+
+[languages.Tact]
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["tact"]
+
+[languages.Tcl]
+name = "TCL"
+line_comment = ["#"]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["tcl"]
+
+[languages.Tera]
+multi_line_comments = [["<!--", "-->"], ["{#", "#}"]]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["tera"]
+
+[languages.Templ]
+name = "Templ"
+line_comment = ["//"]
+multi_line_comments = [["<!--", "-->"], ["/*", "*/"]]
+quotes = [["\"", "'"], ["'", "'"], ["`", "`"]]
+important_syntax = ["templ", "script", "css"]
+extensions = ["templ", "tmpl"]
+
+[languages.Tex]
+name = "TeX"
+line_comment = ["%"]
+extensions = ["tex", "sty"]
+
+[languages.Text]
+name = "Plain Text"
+literate = true
+mime = ["text/plain"]
+extensions = ["text", "txt"]
+
+[languages.Thrift]
+line_comment = ["#", "//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["thrift"]
+
+[languages.Toml]
+name = "TOML"
+line_comment = ["#"]
+quotes = [["\"", "'"], ["'", "'"], ['"""', '"""'], ["'''", "'''"]]
+extensions = ["toml"]
+
+[languages.Tsx]
+name = "TSX"
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "'"], ["'", "'"], ["`", "`"]]
+extensions = ["tsx"]
+
+[languages.Ttcn]
+name = "TTCN-3"
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["ttcn", "ttcn3", "ttcnpp"]
+
+[languages.Twig]
+name = "Twig"
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["twig"]
+multi_line_comments = [["<!--", "-->"], ["{#", "#}"]]
+
+[languages.TypeScript]
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "'"], ["'", "'"], ["`", "`"]]
+extensions = ["ts", "mts", "cts"]
+
+[languages.Typst]
+nested = true
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["typ"]
+
+[languages.Uiua]
+line_comment = ["#"]
+quotes = [["\"", "\""]]
+extensions = ["ua"]
+
+[languages.UMPL]
+line_comment = ["!"]
+quotes = [["`", "`"]]
+extensions = ["umpl"]
+
+[languages.Unison]
+nested = true
+line_comment = ["--"]
+multi_line_comments = [["{-", "-}"]]
+quotes = [["\"", "\""]]
+extensions = ["u"]
+
+[languages.UnrealDeveloperMarkdown]
+name = "Unreal Markdown"
+important_syntax = ["```"]
+extensions = ["udn"]
+
+[languages.UnrealPlugin]
+name = "Unreal Plugin"
+blank = true
+extensions = ["uplugin"]
+
+[languages.UnrealProject]
+name = "Unreal Project"
+blank = true
+extensions = ["uproject"]
+
+[languages.UnrealScript]
+name = "Unreal Script"
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["uc", "uci", "upkg"]
+
+[languages.UnrealShader]
+name = "Unreal Shader"
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["usf"]
+
+[languages.UnrealShaderHeader]
+name = "Unreal Shader Header"
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["ush"]
+
+[languages.UrWeb]
+name = "Ur/Web"
+quotes = [["\"", "\""]]
+multi_line_comments = [["(*", "*)"]]
+extensions = ["ur", "urs"]
+
+[languages.UrWebProject]
+name = "Ur/Web Project"
+line_comment = ["#"]
+extensions = ["urp"]
+
+[languages.Vala]
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["vala"]
+
+[languages.VB6]
+name = "VB6"
+line_comment = ["'"]
+extensions = ["frm", "bas", "cls"]
+
+[languages.VBScript]
+name = "VBScript"
+line_comment = ["'", "REM"]
+extensions = ["vbs"]
+
+[languages.Velocity]
+name = "Apache Velocity"
+line_comment = ["##"]
+multi_line_comments = [["#*", "*#"]]
+extensions = ["vm"]
+quotes = [["'", "'"], ["\"", "'"]]
+
+[languages.Verilog]
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["vg", "vh"]
+
+[languages.VerilogArgsFile]
+name = "Verilog Args File"
+extensions = ["irunargs", "xrunargs"]
+
+[languages.Vhdl]
+name = "VHDL"
+line_comment = ["--"]
+multi_line_comments = [["/*", "*/"]]
+extensions = ["vhd", "vhdl"]
+
+[languages.Virgil]
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "\""]]
+extensions = ["v3"]
+
+[languages.VisualBasic]
+name = "Visual Basic"
+quotes = [["\"", "\""]]
+line_comment = ["'"]
+extensions = ["vb"]
+
+[languages.VisualStudioProject]
+name = "Visual Studio Project"
+multi_line_comments = [["<!--", "-->"]]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["vcproj", "vcxproj"]
+
+[languages.VisualStudioSolution]
+name = "Visual Studio Solution"
+blank = true
+extensions = ["sln"]
+
+[languages.VimScript]
+name = "Vim Script"
+line_comment = ["\""]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["vim"]
+
+[languages.Vue]
+name = "Vue"
+line_comment = ["//"]
+multi_line_comments = [["<!--", "-->"], ["/*", "*/"]]
+quotes = [["\"", "'"], ["'", "'"], ["`", "`"]]
+important_syntax = ["<script", "<style", "<template"]
+extensions = ["vue"]
+
+[languages.WebAssembly]
+line_comment = [";;"]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["wat", "wast"]
+
+[languages.WenYan]
+name = "The WenYan Programming Language"
+multi_line_comments = [["批曰。", "。"], ["疏曰。", "。"]]
+extensions = ["wy"]
+
+[languages.WGSL]
+name = "WebGPU Shader Language"
+line_comment = ["//"]
+extensions = ["wgsl"]
+
+[languages.Wolfram]
+quotes = [["\"", "\""]]
+multi_line_comments = [["(*", "*)"]]
+extensions = ["nb", "wl"]
+
+[languages.Xaml]
+name = "XAML"
+multi_line_comments = [["<!--", "-->"]]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["xaml"]
+
+[languages.XcodeConfig]
+name = "Xcode Config"
+line_comment = ["//"]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["xcconfig"]
+
+[languages.Xml]
+name = "XML"
+multi_line_comments = [["<!--", "-->"]]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["xml"]
+
+[languages.XSL]
+name = "XSL"
+multi_line_comments = [["<!--", "-->"]]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["xsl", "xslt"]
+
+[languages.Xtend]
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "'"], ["'", "'"], ["'''", "'''"]]
+extensions = ["xtend"]
+
+[languages.Yaml]
+name = "YAML"
+line_comment = ["#"]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["yaml", "yml"]
+
+[languages.ZenCode]
+line_comment = ["//", "#"]
+multi_line_comments = [["/*", "*/"]]
+quotes = [["\"", "'"], ["'", "'"]]
+verbatim_quotes = [["@\"", "\""]]
+extensions = ["zs"]
+
+[languages.Zig]
+line_comment = ["//"]
+quotes = [["\"", "\""]]
+extensions = ["zig"]
+
+[languages.Zokrates]
+name = "ZoKrates"
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+extensions = ["zok"]
+
+[languages.Zsh]
+shebangs = ["#!/bin/zsh"]
+line_comment = ["#"]
+quotes = [["\"", "'"], ["'", "'"]]
+extensions = ["zsh"]
+
+[languages.GdShader]
+name = "GDShader"
+line_comment = ["//"]
+multi_line_comments = [["/*", "*/"]]
+extensions = ["gdshader"]

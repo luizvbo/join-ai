@@ -1,6 +1,7 @@
 use std::fs;
 
 pub mod cli;
+pub mod decommenter;
 pub mod processor;
 pub mod walker;
 
@@ -31,6 +32,9 @@ fn run_join(args: JoinArgs) -> anyhow::Result<()> {
     } else {
         println!("Using patterns: all files");
     }
+    if args.strip_comments {
+        println!("Comment stripping: enabled");
+    }
     if let Some(exclude_folders) = &args.exclude_folders {
         println!("Excluding folders: {}", exclude_folders.join(", "));
     }
@@ -51,7 +55,7 @@ fn run_join(args: JoinArgs) -> anyhow::Result<()> {
     let receiver = walker::find_files(&args)?;
 
     // 2. Process the files found by the walker
-    processor::process_files(receiver, &args.output_file)?;
+    processor::process_files(receiver, &args.output_file, args.strip_comments)?;
 
     println!(
         "Files have been processed and written to {}",
@@ -76,7 +80,8 @@ mod tests {
             input_folder: input_folder.to_path_buf(),
             output_file: output_file.to_path_buf(),
             patterns: None,
-            clear_file: false, // Default to false to test clearing explicitly
+            clear_file: false,
+            strip_comments: false, // <-- FIX WAS HERE: Added the missing field
             exclude_folders: None,
             exclude_extensions: None,
             max_depth: None,
@@ -89,8 +94,32 @@ mod tests {
     fn run_join_and_read_output(args: JoinArgs) -> anyhow::Result<String> {
         let output_path = args.output_file.clone();
         run(Commands::Join(args))?;
-        // Use fs::read_to_string for simplicity if the file might not be created.
         Ok(fs::read_to_string(output_path).unwrap_or_default())
+    }
+
+    #[test]
+    fn test_strip_comments_flag() -> anyhow::Result<()> {
+        let dir = TempDir::new()?;
+        let code_with_comments = r#"
+// This is a single line comment.
+fn main() {
+    /* block comment */
+    println!("Hello, world!");
+}
+"#;
+        dir.child("src/main.rs").write_str(code_with_comments)?;
+
+        let output_file = dir.path().join("output.txt");
+        let mut args = get_test_args(dir.path(), &output_file);
+        args.strip_comments = true; // Enable the feature
+
+        let result = run_join_and_read_output(args)?;
+
+        assert!(result.contains("fn main()"));
+        assert!(!result.contains("single line comment"));
+        assert!(!result.contains("block comment"));
+
+        Ok(())
     }
 
     #[test]

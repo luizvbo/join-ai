@@ -9,11 +9,19 @@ edition = "2024"
 description = "A tool to traverse files in a folder and concatenate them into a single text file for GenAI models."
 
 [dependencies]
+aho-corasick = "1.1.3"
 anstyle = "1.0.11"
 anyhow = "1.0.99"
 clap = { version = "4.5.45", features = ["derive", "color"] }
 content_inspector = "0.2.4"
+dashmap = "6.1.0"
+grep-searcher = "0.1.14"
 ignore = "0.4.23"
+log = "0.4.27"
+once_cell = "1.21.3"
+regex = "1.11.2"
+serde = { version = "1.0.219", features = ["derive"] }
+toml = "0.9.5"
 
 [dev-dependencies]
 tempfile = "3.20.0"
