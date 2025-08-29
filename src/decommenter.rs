@@ -1,10 +1,8 @@
-// FILE: ./src/decommenter.rs
 //! This file contains code adapted from the `tokei` project (https://github.com/XAMPPRocky/tokei),
 //! licensed under the MIT License.
 //!
 //! It dynamically loads language definitions from languages.toml.
 
-use grep_searcher::LineStep;
 use serde::Deserialize;
 use std::collections::{BTreeMap, HashMap};
 use std::sync::Arc;
@@ -20,6 +18,8 @@ struct LanguageDefinition {
     #[serde(default, rename = "multi_line_comments")]
     multi_line_comments: Vec<[String; 2]>,
     #[serde(default)]
+    quotes: Vec<[String; 2]>,
+    #[serde(default)]
     nested: bool,
 }
 
@@ -33,10 +33,9 @@ struct LanguagesFile {
 #[derive(Debug)]
 pub struct Language {
     line_comments: Vec<String>,
-    multi_line_comments: Vec<[String; 2]>,
-    any_multi_line_comments: Vec<(String, String)>,
+    multi_line_comments: Vec<(String, String)>,
+    quotes: Vec<(String, String)>,
     allows_nested: bool,
-    // The unused `comment_matcher` has been removed.
 }
 
 // --- Database to hold all loaded languages ---
@@ -48,7 +47,6 @@ pub struct LanguageDB {
 }
 
 impl LanguageDB {
-    /// Loads and parses the languages.toml file.
     pub fn new() -> Self {
         let toml_str = include_str!("languages.toml");
         let languages_file: LanguagesFile =
@@ -62,16 +60,14 @@ impl LanguageDB {
                 ext_map.insert(ext.clone(), name.clone());
             }
 
-            let any_multi_line: Vec<(String, String)> = def
-                .multi_line_comments
-                .iter()
-                .map(|[start, end]| (start.clone(), end.clone()))
-                .collect();
-
             let lang = Language {
                 line_comments: def.line_comments,
-                multi_line_comments: def.multi_line_comments,
-                any_multi_line_comments: any_multi_line,
+                multi_line_comments: def
+                    .multi_line_comments
+                    .into_iter()
+                    .map(|[s, e]| (s, e))
+                    .collect(),
+                quotes: def.quotes.into_iter().map(|[s, e]| (s, e)).collect(),
                 allows_nested: def.nested,
             };
 
@@ -81,7 +77,6 @@ impl LanguageDB {
         Self { languages, ext_map }
     }
 
-    /// Finds a compiled language definition by file extension.
     pub fn find_by_extension(&self, ext: &str) -> Option<Arc<Language>> {
         self.ext_map
             .get(ext)
@@ -92,113 +87,102 @@ impl LanguageDB {
 
 impl Default for LanguageDB {
     fn default() -> Self {
-        LanguageDB::new()
+        Self::new()
     }
 }
 
-// --- Stripping Logic ---
-
-trait SliceExt {
-    fn trim(&self) -> &Self;
-}
-
-impl SliceExt for [u8] {
-    fn trim(&self) -> &Self {
-        fn is_whitespace(c: &u8) -> bool {
-            *c == b' ' || (*c >= 0x09 && *c <= 0x0d)
-        }
-        let start = self.iter().position(|c| !is_whitespace(c)).unwrap_or(0);
-        let end = self.iter().rposition(|c| !is_whitespace(c)).unwrap_or(0);
-        if start > end { &[] } else { &self[start..=end] }
-    }
-}
-
-#[derive(Clone, Debug)]
-struct SyntaxCounter {
-    lang: Arc<Language>,
-    stack: Vec<String>,
-}
-
-impl SyntaxCounter {
-    fn new(lang: Arc<Language>) -> Self {
-        Self {
-            lang,
-            stack: Vec::with_capacity(1),
-        }
-    }
-
-    fn line_is_comment(&self, line: &[u8], in_comment_block: bool) -> bool {
-        let trimmed = line.trim();
-        if in_comment_block {
-            return true;
-        }
-        if self
-            .lang
-            .line_comments
-            .iter()
-            .any(|c| trimmed.starts_with(c.as_bytes()))
-        {
-            return true;
-        }
-        if self
-            .lang
-            .multi_line_comments
-            .iter()
-            .any(|[s, e]| trimmed.starts_with(s.as_bytes()) && trimmed.ends_with(e.as_bytes()))
-        {
-            return true;
-        }
-        false
-    }
-}
+// --- NEW, ROBUST Stripping Logic ---
 
 /// Strips comment lines from file content for a given language.
 pub fn strip_comments(contents: &[u8], lang: Arc<Language>) -> Vec<u8> {
-    let mut syntax = SyntaxCounter::new(lang);
     let mut output = Vec::with_capacity(contents.len());
-    let mut stepper = LineStep::new(b'\n', 0, contents.len());
+    let mut cursor = 0;
+    let mut comment_stack: Vec<String> = Vec::new();
+    let mut string_delimiter: Option<String> = None;
 
-    while let Some((start, end)) = stepper.next(contents) {
-        let line = &contents[start..end];
-        let line_trimmed = line.trim();
+    while cursor < contents.len() {
+        let remaining = &contents[cursor..];
 
-        if line_trimmed.is_empty() {
-            output.extend_from_slice(line);
-            if end < contents.len() {
-                output.push(b'\n');
+        if let Some(delim) = &string_delimiter {
+            // --- We are inside a string ---
+            if remaining.starts_with(delim.as_bytes()) {
+                // End of string
+                output.extend_from_slice(delim.as_bytes());
+                cursor += delim.len();
+                string_delimiter = None;
+            } else if remaining.starts_with(b"\\") && remaining.len() > 1 {
+                // Escaped character
+                output.extend_from_slice(&remaining[0..2]);
+                cursor += 2;
+            } else {
+                // Normal character in string
+                output.push(remaining[0]);
+                cursor += 1;
             }
-            continue;
-        }
+        } else if let Some(end_delim) = comment_stack.last() {
+            // --- We are inside a multi-line comment ---
+            if remaining.starts_with(end_delim.as_bytes()) {
+                cursor += end_delim.len();
+                comment_stack.pop();
+            } else {
+                cursor += 1; // Consume character without adding to output
+            }
+        } else {
+            // --- We are in code ---
+            let mut next_delimiter_pos: Option<usize> = None;
 
-        let in_comment_block_before_line = !syntax.stack.is_empty();
+            // Find the earliest next delimiter (comment or string)
+            let mut all_delims = Vec::new();
+            all_delims.extend(lang.line_comments.iter());
+            all_delims.extend(lang.multi_line_comments.iter().map(|(s, _)| s));
+            all_delims.extend(lang.quotes.iter().map(|(s, _)| s));
 
-        // Process this line for changes in multi-line comment state
-        let mut i = 0;
-        while i < line.len() {
-            if let Some(last) = syntax.stack.last() {
-                if line[i..].starts_with(last.as_bytes()) {
-                    i += last.len();
-                    syntax.stack.pop();
-                    continue;
+            for delim in &all_delims {
+                if let Some(pos) = find_subsequence(remaining, delim.as_bytes()) {
+                    next_delimiter_pos = Some(next_delimiter_pos.map_or(pos, |p| p.min(pos)));
+                }
+            }
+
+            if let Some(pos) = next_delimiter_pos {
+                // Append the code before the delimiter
+                output.extend_from_slice(&remaining[..pos]);
+                cursor += pos;
+
+                // Update state based on the delimiter we found
+                let remaining_at_delim = &contents[cursor..];
+                if let Some(_delim) = lang
+                    .line_comments
+                    .iter()
+                    .find(|d| remaining_at_delim.starts_with(d.as_bytes()))
+                {
+                    // It's a line comment, skip to the end of the line
+                    if let Some(end_of_line) = find_subsequence(remaining_at_delim, b"\n") {
+                        cursor += end_of_line; // The newline will be handled in the next iteration
+                    } else {
+                        cursor = contents.len(); // End of file
+                    }
+                } else if let Some((start, end)) = lang
+                    .multi_line_comments
+                    .iter()
+                    .find(|(s, _)| remaining_at_delim.starts_with(s.as_bytes()))
+                {
+                    if comment_stack.is_empty() || lang.allows_nested {
+                        comment_stack.push(end.clone());
+                    }
+                    cursor += start.len();
+                } else if let Some((start, end)) = lang
+                    .quotes
+                    .iter()
+                    .find(|(s, _)| remaining_at_delim.starts_with(s.as_bytes()))
+                {
+                    string_delimiter = Some(end.clone());
+                    output.extend_from_slice(start.as_bytes());
+                    cursor += start.len();
                 }
             } else {
-                for (s, e) in &syntax.lang.any_multi_line_comments {
-                    if line[i..].starts_with(s.as_bytes()) {
-                        if syntax.stack.is_empty() || syntax.lang.allows_nested {
-                            syntax.stack.push(e.clone());
-                        }
-                        i += s.len();
-                        continue;
-                    }
-                }
-            }
-            i += 1;
-        }
-
-        if !syntax.line_is_comment(line, in_comment_block_before_line) {
-            output.extend_from_slice(line);
-            if end < contents.len() {
-                output.push(b'\n');
+                // No more delimiters, append the rest of the file
+                output.extend_from_slice(remaining);
+                cursor = contents.len();
             }
         }
     }
@@ -206,12 +190,18 @@ pub fn strip_comments(contents: &[u8], lang: Arc<Language>) -> Vec<u8> {
     output
 }
 
-// --- Unit Tests ---
+// Helper to find a subsequence (needle) in a slice (haystack)
+fn find_subsequence(haystack: &[u8], needle: &[u8]) -> Option<usize> {
+    haystack
+        .windows(needle.len())
+        .position(|window| window == needle)
+}
+
+// --- CORRECTED Unit Tests ---
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    // Helper function to make testing easier
     fn assert_stripped(ext: &str, input: &str, expected: &str) {
         let db = LanguageDB::new();
         let lang = db
@@ -219,7 +209,12 @@ mod tests {
             .unwrap_or_else(|| panic!("Language for extension '{}' not found", ext));
         let stripped_bytes = strip_comments(input.as_bytes(), lang);
         let stripped_str = String::from_utf8(stripped_bytes).unwrap();
-        assert_eq!(stripped_str.trim(), expected.trim());
+
+        // Normalize line endings for comparison on different OS
+        let normalized_stripped = stripped_str.replace("\r\n", "\n");
+        let normalized_expected = expected.replace("\r\n", "\n");
+
+        assert_eq!(normalized_stripped.trim(), normalized_expected.trim());
     }
 
     #[test]
@@ -313,18 +308,50 @@ fn test() {}
     }
 
     #[test]
-    fn limitation_comment_syntax_in_string() {
-        // NOTE: This test demonstrates a known limitation. The current simplified
-        // stripper does not track string literal state, so it will incorrectly
-        // strip content that looks like a comment inside a string.
+    fn preserves_comment_syntax_in_string() {
+        // This test now asserts the CORRECT behavior: strings are preserved.
         let input = r#"
 let url = "http://example.com"; // This is a URL
 let path = "C://Users/test";
 "#;
-        // The `//` in the string is incorrectly identified as a comment.
         let expected = r#"
 let url = "http://example.com";
-let path = "C:";
+let path = "C://Users/test";
+"#;
+        assert_stripped("rs", input, expected);
+    }
+
+    #[test]
+    fn preserves_blank_lines() {
+        let input = r#"
+fn main() {
+
+    // A comment
+
+    println!("Hello");
+
+}
+"#;
+        let expected = r#"
+fn main() {
+
+
+    println!("Hello");
+
+}
+"#;
+        assert_stripped("rs", input, expected);
+    }
+
+    #[test]
+    fn handles_unclosed_block_comment() {
+        let input = r#"
+fn main() {
+    /* start of comment
+    and it never ends...
+"#;
+        let expected = r#"
+fn main() {
 "#;
         assert_stripped("rs", input, expected);
     }
