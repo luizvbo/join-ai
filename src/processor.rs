@@ -5,8 +5,6 @@ use std::sync::mpsc;
 
 /// This module handles the processing of files. It receives file paths from the
 /// walker, reads their content, and writes it to the final output file.
-
-/// Processes file paths received from a channel, concatenating their content.
 ///
 /// # Arguments
 /// * `rx` - The receiver end of a channel, which provides `PathBuf`s from the walker.

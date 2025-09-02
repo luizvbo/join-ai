@@ -6,8 +6,6 @@ use std::sync::mpsc;
 /// This module is responsible for efficiently finding all files that match the
 /// user's criteria using the `ignore` crate, which is excellent at respecting
 /// rules like `.gitignore` and handling parallel directory traversal.
-
-/// Sets up and executes the file walker.
 ///
 /// The walker runs in a separate thread pool and sends valid file paths back to the
 /// main thread through a multi-producer, single-consumer (mpsc) channel.
@@ -47,7 +45,7 @@ pub fn find_files(args: &JoinArgs) -> anyhow::Result<mpsc::Receiver<PathBuf>> {
     // Add all exclusion patterns. These are prefixed with "!" to negate the match.
     if let Some(exclude_patterns) = &args.exclude {
         for pattern in exclude_patterns {
-            let exclusion_pattern = format!("!{}", pattern);
+            let exclusion_pattern = format!("!{pattern}");
             override_builder.add(&exclusion_pattern)?;
         }
     }
