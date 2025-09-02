@@ -6,67 +6,73 @@ use std::path::PathBuf;
 #[derive(Parser, Debug, Clone)]
 #[command(author, version, about, long_about = None, color = ColorChoice::Always)]
 pub struct Cli {
+    /// The subcommand to execute (e.g., 'join' or 'update').
     #[command(subcommand)]
     pub command: Commands,
 }
 
+/// Defines the available subcommands for the application.
 #[derive(Subcommand, Debug, Clone)]
 pub enum Commands {
-    /// Concatenate files into a single text file
+    /// Concatenate files into a single text file.
     Join(JoinArgs),
-    /// Update the application to the latest version [placeholder]
+    /// Update the application to the latest version [placeholder].
     Update(UpdateArgs),
 }
 
-/// Arguments for the 'join' command
+/// Defines the arguments for the 'join' subcommand.
 #[derive(ClapArgs, Debug, Clone)]
 pub struct JoinArgs {
-    /// The input folder to traverse for files
+    /// The root folder to start traversing for files. This is a required argument.
     #[arg(required = true)]
     pub input_folder: PathBuf,
 
-    /// The output file to write the concatenated content to
+    /// The path to the output file where the concatenated content will be written.
     #[arg(short, long, default_value = "concatenated.txt")]
     pub output_file: PathBuf,
 
-    /// File patterns to include. Can be specified multiple times (e.g., -p "*.rs" -p "*.md")
-    #[arg(short, long, action = clap::ArgAction::Append)]
+    /// Glob patterns for files to *include*. Can be specified multiple times.
+    /// If not provided, all files are considered (subject to exclusions).
+    /// Example: -p "*.rs" -p "*.md"
+    #[arg(short = 'p', long, action = clap::ArgAction::Append, value_name = "PATTERN")]
     pub patterns: Option<Vec<String>>,
 
-    /// Clear the output file before writing
+    /// Glob patterns for files or folders to *exclude*. Can be specified multiple times.
+    /// This is a powerful way to filter out unwanted content like build artifacts or logs.
+    /// Example: -x "*.log" -x "target/"
+    #[arg(short = 'x', long, action = clap::ArgAction::Append, value_name = "PATTERN")]
+    pub exclude: Option<Vec<String>>,
+
+    /// If set, the output file will be deleted before writing new content.
     #[arg(short, long)]
     pub clear_file: bool,
 
-    /// Folders to exclude from the search. Can be specified multiple times.
-    #[arg(short, long, action = clap::ArgAction::Append)]
-    pub exclude_folders: Option<Vec<String>>,
-
-    /// File extensions to exclude. Can be specified multiple times.
-    #[arg(long, action = clap::ArgAction::Append)]
-    pub exclude_extensions: Option<Vec<String>>,
-
-    /// Set the maximum search depth
+    /// Sets the maximum depth for directory traversal. A depth of 0 means only the
+    /// input folder itself will be scanned.
     #[arg(long)]
     pub max_depth: Option<usize>,
 
-    /// Include hidden files in the search
+    /// If set, hidden files and directories (those starting with a '.') will be included.
     #[arg(long)]
     pub hidden: bool,
 
-    /// Do not follow symlinks
+    /// If set to false, the walker will follow symbolic links. Defaults to true (no-follow).
     #[arg(long, default_value_t = true)]
     pub no_follow: bool,
 }
 
-/// Arguments for the 'update' command
+/// Defines the arguments for the 'update' subcommand. Currently a placeholder.
 #[derive(ClapArgs, Debug, Clone)]
 pub struct UpdateArgs {}
 
+// --- Unit Tests for CLI Parsing ---
 #[cfg(test)]
 mod tests {
-    use super::*; // Import all items from the parent cli module
-    use clap::error::ErrorKind; // Import the ErrorKind enum
+    use super::*;
+    use clap::error::ErrorKind;
 
+    /// Verifies that the `join` command parses the required input folder and
+    /// correctly applies default values for all optional arguments.
     #[test]
     fn test_basic_join_command_and_defaults() {
         let args = vec!["join-ai", "join", "./my-project"];
@@ -80,8 +86,7 @@ mod tests {
                 assert!(!join_args.clear_file);
                 assert!(!join_args.hidden);
                 assert!(join_args.patterns.is_none());
-                assert!(join_args.exclude_folders.is_none());
-                assert!(join_args.exclude_extensions.is_none());
+                assert!(join_args.exclude.is_none());
                 assert!(join_args.max_depth.is_none());
                 assert!(join_args.no_follow); // Default is true
             }
@@ -89,6 +94,8 @@ mod tests {
         }
     }
 
+    /// Verifies that all provided flags and options for the `join` command
+    /// are parsed correctly into the `JoinArgs` struct.
     #[test]
     fn test_all_join_options_are_parsed() {
         let args = vec![
@@ -102,18 +109,13 @@ mod tests {
             "-p",
             "*.toml",
             "--clear-file",
-            "-e",
-            "target",
-            "--exclude-folders",
-            ".git", // Test long name for exclude
-            "--exclude-extensions",
-            "log",
-            "--exclude-extensions",
-            "tmp",
+            "-x",
+            "target/",
+            "--exclude",
+            "*.log",
             "--max-depth",
             "10",
             "--hidden",
-            // We omit --no-follow to ensure the default is still applied
         ];
         let cli = Cli::try_parse_from(args).unwrap();
 
@@ -127,12 +129,8 @@ mod tests {
                 );
                 assert!(join_args.clear_file);
                 assert_eq!(
-                    join_args.exclude_folders,
-                    Some(vec!["target".to_string(), ".git".to_string()])
-                );
-                assert_eq!(
-                    join_args.exclude_extensions,
-                    Some(vec!["log".to_string(), "tmp".to_string()])
+                    join_args.exclude,
+                    Some(vec!["target/".to_string(), "*.log".to_string()])
                 );
                 assert_eq!(join_args.max_depth, Some(10));
                 assert!(join_args.hidden);
@@ -142,6 +140,7 @@ mod tests {
         }
     }
 
+    /// Ensures the `update` subcommand is recognized and parsed correctly.
     #[test]
     fn test_update_subcommand_is_parsed() {
         let args = vec!["join-ai", "update"];
@@ -150,9 +149,9 @@ mod tests {
         assert!(matches!(cli.command, Commands::Update(_)));
     }
 
+    /// Confirms that parsing fails if the required `input_folder` argument is missing.
     #[test]
     fn test_missing_required_argument_fails() {
-        // Missing the required `input_folder` argument
         let args = vec!["join-ai", "join", "-o", "output.txt"];
         let result = Cli::try_parse_from(args);
 
@@ -166,13 +165,13 @@ mod tests {
         );
     }
 
+    /// Confirms that parsing fails if no subcommand (like 'join') is provided.
     #[test]
     fn test_no_subcommand_fails() {
         let args = vec!["join-ai"];
         let result = Cli::try_parse_from(args);
 
         assert!(result.is_err(), "Parsing should fail without a subcommand");
-        // THIS IS THE FIX: Assert against the correct ErrorKind
         assert_eq!(
             result.unwrap_err().kind(),
             ErrorKind::DisplayHelpOnMissingArgumentOrSubcommand
