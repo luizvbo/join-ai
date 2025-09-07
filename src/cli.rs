@@ -59,6 +59,10 @@ pub struct JoinArgs {
     /// If set to false, the walker will follow symbolic links. Defaults to true (no-follow).
     #[arg(long, default_value_t = true)]
     pub no_follow: bool,
+
+    /// Enable verbose output. Use -v for basic info, -vv for detailed debugging.
+    #[arg(short, long, action = clap::ArgAction::Count)]
+    pub verbose: u8,
 }
 
 /// Defines the arguments for the 'update' subcommand. Currently a placeholder.
@@ -89,6 +93,7 @@ mod tests {
                 assert!(join_args.exclude.is_none());
                 assert!(join_args.max_depth.is_none());
                 assert!(join_args.no_follow); // Default is true
+                assert_eq!(join_args.verbose, 0);
             }
             _ => panic!("Expected Join command to be parsed"),
         }
@@ -116,6 +121,7 @@ mod tests {
             "--max-depth",
             "10",
             "--hidden",
+            "-vv",
         ];
         let cli = Cli::try_parse_from(args).unwrap();
 
@@ -135,6 +141,7 @@ mod tests {
                 assert_eq!(join_args.max_depth, Some(10));
                 assert!(join_args.hidden);
                 assert!(join_args.no_follow);
+                assert_eq!(join_args.verbose, 2);
             }
             _ => panic!("Expected Join command to be parsed"),
         }
