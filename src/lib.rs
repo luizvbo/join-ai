@@ -54,7 +54,7 @@ fn run_join(args: JoinArgs) -> anyhow::Result<()> {
 
     // --- 4. Process the files found by the walker ---
     // The processor reads each file and appends its content to the output file.
-    processor::process_files(receiver, &args.output_file)?;
+    processor::process_files(receiver, &args.output_file, args.verbose)?;
 
     println!(
         "Files have been processed and written to {}",
@@ -85,6 +85,7 @@ mod tests {
             max_depth: None,
             hidden: false,
             no_follow: true,
+            verbose: 0,
         }
     }
 

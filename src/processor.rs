@@ -9,9 +9,11 @@ use std::sync::mpsc;
 /// # Arguments
 /// * `rx` - The receiver end of a channel, which provides `PathBuf`s from the walker.
 /// * `output_file_path` - The path to the file where content should be written.
+/// * `verbose` - The verbosity level for logging.
 pub fn process_files(
     rx: mpsc::Receiver<PathBuf>,
     output_file_path: &PathBuf,
+    verbose: u8,
 ) -> anyhow::Result<()> {
     // Create or truncate the output file, making it ready for writing.
     let mut output_file = File::create(output_file_path)?;
@@ -24,8 +26,16 @@ pub fn process_files(
                 // A simple and robust way to detect binary files is to check for the NUL byte,
                 // which is common in compiled files but rare in text files.
                 if contents.contains(&0) {
-                    println!("Skipping binary file: {}", path.display());
+                    if verbose > 0 {
+                        println!("- Skipping binary file: {}", path.display());
+                    }
                     continue; // Skip to the next file.
+                }
+
+                if verbose > 0 && verbose < 2 {
+                    // At level -v, show what's being included.
+                    // At -vv, this is redundant with the walker's output.
+                    println!("+ Including file: {}", path.display());
                 }
 
                 // Write a header comment to delineate files in the concatenated output.
